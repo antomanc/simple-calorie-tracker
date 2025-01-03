@@ -1,0 +1,11 @@
+{
+  "prettier.eslintIntegration": true,
+  "editor.formatOnSave": true,
+  "files.exclude": {
+    "**/*.git": true,
+    "**/*.expo": true,
+    ".*": true,
+    "**/*.DS_Store": true,
+    "node_modules/": true
+  }
+}
