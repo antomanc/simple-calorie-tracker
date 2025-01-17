@@ -33,10 +33,12 @@ export const useSearchFood = () => {
 	const requestIdRefGeneric = useRef(0)
 	const requestIdRefBranded = useRef(0)
 
-	const { usdaApiKey } = useSettings()
+	const { usdaApiKey, userUuid } = useSettings()
 
 	const handleSearch = useCallback(
 		async (type: SearchType, searchQuery?: string) => {
+			if (!userUuid) return
+
 			const currentState = searchState[type]
 			const trimmedQuery = searchQuery?.trim() ?? currentState.searchQuery
 
@@ -74,7 +76,7 @@ export const useSearchFood = () => {
 			try {
 				const results = await (type === "generic"
 					? searchByNameUsda(trimmedQuery, usdaApiKey)
-					: searchByNameOpenFoodFacts(trimmedQuery))
+					: searchByNameOpenFoodFacts(trimmedQuery, userUuid))
 
 				if (
 					(type === "generic" &&
@@ -112,7 +114,7 @@ export const useSearchFood = () => {
 				}
 			}
 		},
-		[searchState, usdaApiKey]
+		[searchState, usdaApiKey, userUuid]
 	)
 
 	return {

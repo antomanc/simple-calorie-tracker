@@ -6,6 +6,7 @@ import React, {
 	useMemo,
 	useState,
 } from "react"
+import * as Crypto from "expo-crypto"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 interface SettingsContextProps {
@@ -14,6 +15,7 @@ interface SettingsContextProps {
 	targetProteinPercentage: number | undefined
 	targetFatPercentage: number | undefined
 	usdaApiKey: string | undefined
+	userUuid: string | undefined
 	updateTargetCalories: (value: number) => void
 	updateTargetCarbsPercentage: (value: number) => void
 	updateTargetProteinPercentage: (value: number) => void
@@ -34,12 +36,14 @@ export const SettingsProvider: React.FC<React.PropsWithChildren> = ({
 		targetProteinPercentage: number | undefined
 		targetFatPercentage: number | undefined
 		usdaApiKey: string | undefined
+		userUuid: string | undefined
 	}>({
 		targetCalories: undefined,
 		targetCarbsPercentage: undefined,
 		targetProteinPercentage: undefined,
 		targetFatPercentage: undefined,
 		usdaApiKey: undefined,
+		userUuid: undefined,
 	})
 
 	const getStoredSetting = useCallback(
@@ -81,12 +85,19 @@ export const SettingsProvider: React.FC<React.PropsWithChildren> = ({
 				25
 			)
 			const usdaApiKey = await getStoredSetting("USDA_API_KEY", "")
+			let userUuid = await getStoredSetting("USER_UUID", "")
+			if (!userUuid) {
+				const uuid = Crypto.randomUUID()
+				await AsyncStorage.setItem("USER_UUID", JSON.stringify(uuid))
+				userUuid = uuid
+			}
 			setSettings({
 				targetCalories,
 				targetCarbsPercentage,
 				targetProteinPercentage,
 				targetFatPercentage,
 				usdaApiKey,
+				userUuid,
 			})
 		}
 

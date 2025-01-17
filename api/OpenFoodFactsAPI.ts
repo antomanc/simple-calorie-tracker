@@ -70,11 +70,9 @@ const OpenFoodFactsProductToFood = (
 	}
 }
 
-// TODO change the uuid to a random one for each user
 const headers = {
 	app_name: "simple-calorie-tracker",
-	app_version: "0.1",
-	app_uuid: "123e4567-e89b-12d3-a456-426614174000",
+	app_version: "1.0",
 }
 
 const fields = [
@@ -94,7 +92,8 @@ const params: { [key: string]: string | number } = {
 	page_size: 10,
 }
 export const searchByBarcode = async (
-	barcode: string
+	barcode: string,
+	uuid: string
 ): Promise<Food | null> => {
 	const url = new URL(
 		`https://world.openfoodfacts.org/api/v2/product/${barcode}`
@@ -102,19 +101,31 @@ export const searchByBarcode = async (
 	Object.keys(params).forEach((key) =>
 		url.searchParams.append(key, params[key] as string)
 	)
-	const response = await axios.get(url.href, { headers })
+	const requestHeaders = {
+		...headers,
+		app_uuid: uuid,
+	}
+	console.log("Searching by barcode:", barcode, "uuid:", uuid)
+	const response = await axios.get(url.href, { headers: requestHeaders })
 	const product = response.data.product as OpenFoodFactsProduct
 	if (!filterProduct(product)) return null
 	return OpenFoodFactsProductToFood(product)
 }
 
-export const searchByName = async (query: string): Promise<Food[]> => {
+export const searchByName = async (
+	query: string,
+	uuid: string
+): Promise<Food[]> => {
 	const url = new URL("https://it.openfoodfacts.org/cgi/search.pl")
 	url.searchParams.append("search_terms", query.trim())
 	Object.keys(params).forEach((key) =>
 		url.searchParams.append(key, params[key] as string)
 	)
-	const response = await axios.get(url.href, { headers })
+	const requestHeaders = {
+		...headers,
+		app_uuid: uuid,
+	}
+	const response = await axios.get(url.href, { headers: requestHeaders })
 	const products = response.data.products as OpenFoodFactsProduct[]
 	return products.filter(filterProduct).map(OpenFoodFactsProductToFood)
 }

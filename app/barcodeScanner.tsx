@@ -4,6 +4,7 @@ import { Header } from "@/components/Header"
 import { ThemedText } from "@/components/ThemedText"
 import { useThemeColor } from "@/hooks/useThemeColor"
 import { SelectionContext } from "@/providers/SelectionProvider"
+import { useSettings } from "@/providers/SettingsProvider"
 import { Ionicons } from "@expo/vector-icons"
 import {
 	BarcodeScanningResult,
@@ -68,10 +69,13 @@ export default function BarcodeScanner() {
 		setFlash(!torch)
 	}
 
+	const { userUuid } = useSettings()
+
 	const handleBarcodeScanned = (barcode: BarcodeScanningResult) => {
 		if (isLoading) return
+		if (!userUuid) return
 		setIsLoading(true)
-		searchByBarcode(barcode.data)
+		searchByBarcode(barcode.data, userUuid)
 			.then((response) => {
 				setIsLoading(false)
 				if (!response) {
@@ -134,13 +138,9 @@ export default function BarcodeScanner() {
 						style={styles.camera}
 						enableTorch={torch}
 						onBarcodeScanned={handleBarcodeScanned}
+						autofocus="on"
 						barcodeScannerSettings={{
-							barcodeTypes: [
-								"codabar",
-								"ean13",
-								"upc_a",
-								"upc_e",
-							],
+							barcodeTypes: ["ean13", "upc_a", "upc_e", "ean8"],
 						}}
 					>
 						<View style={styles.buttonContainer}>
