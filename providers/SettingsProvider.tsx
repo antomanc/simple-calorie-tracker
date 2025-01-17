@@ -18,7 +18,7 @@ interface SettingsContextProps {
 	updateTargetCarbsPercentage: (value: number) => void
 	updateTargetProteinPercentage: (value: number) => void
 	updateTargetFatPercentage: (value: number) => void
-	updateUsdaApiKey: (value: string) => void
+	updateUsdaApiKey: (value?: string) => void
 }
 
 const SettingsContext = createContext<SettingsContextProps | undefined>(
@@ -53,10 +53,10 @@ export const SettingsProvider: React.FC<React.PropsWithChildren> = ({
 	const updateSetting = useCallback(
 		async (
 			key: string,
-			value: number | string,
-			field: keyof typeof settings
+			field: keyof typeof settings,
+			value?: number | string
 		) => {
-			await AsyncStorage.setItem(key, value.toString())
+			await AsyncStorage.setItem(key, JSON.stringify(value))
 			setSettings((prev) => ({ ...prev, [field]: value }))
 		},
 		[]
@@ -97,27 +97,27 @@ export const SettingsProvider: React.FC<React.PropsWithChildren> = ({
 		() => ({
 			...settings,
 			updateTargetCalories: (value: number) =>
-				updateSetting("TARGET_CALORIES", value, "targetCalories"),
+				updateSetting("TARGET_CALORIES", "targetCalories", value),
 			updateTargetCarbsPercentage: (value: number) =>
 				updateSetting(
 					"TARGET_CARBS_PERCENTAGE",
-					value,
-					"targetCarbsPercentage"
+					"targetCarbsPercentage",
+					value
 				),
 			updateTargetProteinPercentage: (value: number) =>
 				updateSetting(
 					"TARGET_PROTEIN_PERCENTAGE",
-					value,
-					"targetProteinPercentage"
+					"targetProteinPercentage",
+					value
 				),
 			updateTargetFatPercentage: (value: number) =>
 				updateSetting(
 					"TARGET_FAT_PERCENTAGE",
-					value,
-					"targetFatPercentage"
+					"targetFatPercentage",
+					value
 				),
-			updateUsdaApiKey: (value: string) =>
-				updateSetting("USDA_API_KEY", value, "usdaApiKey"),
+			updateUsdaApiKey: (value?: string) =>
+				updateSetting("USDA_API_KEY", "usdaApiKey", value),
 		}),
 		[settings, updateSetting]
 	)

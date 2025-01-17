@@ -66,7 +66,7 @@ export default function Index() {
 
 	const handleTextChange = useCallback(
 		(value?: string, setter?: (value?: string) => void) => {
-			if (value || !setter) {
+			if (!setter) {
 				return
 			}
 			setter(value)
