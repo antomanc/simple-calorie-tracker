@@ -52,6 +52,10 @@ export const searchByName = async (
 ): Promise<Food[]> => {
 	const baseUrl = "https://api.nal.usda.gov/fdc/v1/foods/search"
 	const url = new URL(baseUrl)
+	// if the API key is empty, use the default one
+	if (apiKey.trim() === "") {
+		apiKey = USDA_API_KEY_DEFAULT
+	}
 	url.searchParams.append("api_key", apiKey)
 	url.searchParams.append("query", query.trim())
 	url.searchParams.append("dataType", dataType.join(","))
