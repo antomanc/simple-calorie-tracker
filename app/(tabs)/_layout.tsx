@@ -5,13 +5,12 @@ import { useThemeColor } from "@/hooks/useThemeColor"
 import { useMemo } from "react"
 import { StyleSheet } from "react-native"
 
-const handleTabPress = () => {
-	// TODO add a setting to enable/disable haptics
-	Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
-}
-
 export default function TabLayout() {
 	const theme = useThemeColor()
+	const handleTabPress = () => {
+		// TODO add a setting to enable/disable haptics
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+	}
 
 	const styles = useMemo(
 		() =>

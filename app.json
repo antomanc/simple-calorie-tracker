@@ -15,7 +15,7 @@
 		"android": {
 			"adaptiveIcon": {
 				"foregroundImage": "./assets/images/foreground.png",
-				"backgroundColor": "#ffffff"
+				"backgroundColor": "#111928"
 			},
 			"package": "com.antomanc.simplecalorietracker"
 		},
@@ -32,7 +32,7 @@
 					"image": "./assets/images/foreground.png",
 					"imageWidth": 200,
 					"resizeMode": "contain",
-					"backgroundColor": "#ffffff"
+					"backgroundColor": "#111928"
 				}
 			]
 		],
