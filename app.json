@@ -1,6 +1,6 @@
 {
 	"expo": {
-		"name": "simple-calorie-tracker",
+		"name": "Simple Calorie Tracker",
 		"slug": "simple-calorie-tracker",
 		"version": "1.0.0",
 		"orientation": "portrait",
@@ -9,13 +9,15 @@
 		"userInterfaceStyle": "automatic",
 		"newArchEnabled": true,
 		"ios": {
-			"supportsTablet": true
+			"supportsTablet": true,
+			"bundleIdentifier": "com.antomanc.simplecalorietracker"
 		},
 		"android": {
 			"adaptiveIcon": {
-				"foregroundImage": "./assets/images/adaptive-icon.png",
+				"foregroundImage": "./assets/images/foreground.png",
 				"backgroundColor": "#ffffff"
-			}
+			},
+			"package": "com.antomanc.simplecalorietracker"
 		},
 		"web": {
 			"bundler": "metro",
@@ -27,7 +29,7 @@
 			[
 				"expo-splash-screen",
 				{
-					"image": "./assets/images/splash-icon.png",
+					"image": "./assets/images/foreground.png",
 					"imageWidth": 200,
 					"resizeMode": "contain",
 					"backgroundColor": "#ffffff"
