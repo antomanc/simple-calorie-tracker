@@ -185,7 +185,7 @@ export const useDiary = () => {
 			const kcal =
 				entry.food.energy_100g *
 				(entry.is_servings
-					? entry.quantity * entry.food.serving_quantity
+					? (entry.quantity * entry.food.serving_quantity / 100)
 					: entry.quantity / 100)
 			await db.runAsync(
 				`UPDATE diary_entries
