@@ -13,6 +13,13 @@ This is a free and open source **React Native** application that helps you track
 - Track calories, protein, fat, and carbohydrates in a daily diary
 - Customize your daily targets
 
+## TODOs
+
+- [ ] Cache for USDA searches. Since the USDA databases changes very rarely, a cache for queries can be implemented without worries, with a very long invalidation time.
+- [ ] Recents and frequently used foods. This could be a very handy feature for people that eat some food very ofted, like cereals, milk, eggs or this kind of food.
+- [ ] Internationalization. I developed this app without multi languages support in mind, but since there is a small set of pages and components, it's not an hard to implement feature.
+- [ ] Changing the day in the diary. At the moment the diary page supports only showing the current day, but having the possibility to change the day could be useful.
+
 ## Installation
 
 You can install the app from the latest [GitHub release](https://github.com/antomanc/simple-calorie-tracker/releases/latest) or build it yourself:
