@@ -23,9 +23,6 @@ interface ValidOpenFoodFactsProduct extends OpenFoodFactsProduct {
 	carbohydrates_100g: number
 }
 
-// TODO add a setting to change the domain from world to another country
-// of the user's choice
-
 const filterProduct = (
 	product: OpenFoodFactsProduct
 ): product is ValidOpenFoodFactsProduct => {
@@ -116,7 +113,8 @@ export const searchByName = async (
 	query: string,
 	uuid: string
 ): Promise<Food[]> => {
-	const url = new URL("https://it.openfoodfacts.org/cgi/search.pl")
+	// TODO setting to change the domain from world to another country
+	const url = new URL("https://world.openfoodfacts.org/cgi/search.pl")
 	url.searchParams.append("search_terms", query.trim())
 	Object.keys(params).forEach((key) =>
 		url.searchParams.append(key, params[key] as string)

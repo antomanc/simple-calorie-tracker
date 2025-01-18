@@ -34,6 +34,13 @@
 					"resizeMode": "contain",
 					"backgroundColor": "#111928"
 				}
+			],
+			[
+				"react-native-vision-camera",
+				{
+					"cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera.",
+					"enableCodeScanner": true
+				}
 			]
 		],
 		"experiments": {

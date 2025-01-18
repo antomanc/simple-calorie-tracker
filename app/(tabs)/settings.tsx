@@ -108,8 +108,6 @@ export default function Index() {
 		[targetCarbsPercentage, targetProteinPercentage, targetFatPercentage]
 	)
 
-	console.log(usdaApiKey)
-
 	return (
 		<View style={styles.mainContainer}>
 			<Header title="Settings" />
