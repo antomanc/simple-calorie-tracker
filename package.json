@@ -55,6 +55,7 @@
 		"react-native-screens": "~4.4.0",
 		"react-native-snackbar": "^2.8.0",
 		"react-native-svg": "^15.10.1",
+		"react-native-vision-camera": "^4.6.3",
 		"react-native-web": "~0.19.13",
 		"react-native-webview": "13.12.5"
 	},
