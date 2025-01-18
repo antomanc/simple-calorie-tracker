@@ -1,5 +1,8 @@
 # Simple Calorie Tracker
 
+<img src="https://github.com/user-attachments/assets/31b11fdb-5bb3-4e45-9eb4-36a74bd438de" alt="app screenshot" height="400">
+<img src="https://github.com/user-attachments/assets/e50f6aea-4b3b-44b5-aab4-a8ef274b509a" alt="app screenshot" height="400">
+
 [<img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="80">](https://github.com/antomanc/simple-calorie-tracker/releases/latest)
 
 This is a free and open source **React Native** application that helps you track your daily calories, macros, and meals. The design is inspired by Yazio.
