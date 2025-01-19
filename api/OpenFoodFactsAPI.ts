@@ -1,4 +1,5 @@
 import { Food } from "@/hooks/useDiary"
+import { generateDatabaseId } from "@/utils/Ids"
 import { capitalizeFirstLetter } from "@/utils/Strings"
 import axios from "axios"
 
@@ -55,15 +56,15 @@ const OpenFoodFactsProductToFood = (
 	const energy_100g = product.energy_100g / 4.184
 
 	return {
-		id: product.id.toString(),
+		id: generateDatabaseId({ source: "OPENFOODFACTS", id: product.id }),
 		name: capitalizeFirstLetter(product.product_name),
 		brand: capitalizeFirstLetter(brand),
 		// Convert kJ to kcal and round to nearest integer
-		energy_100g: Math.round(energy_100g),
-		protein_100g: Math.round(product.proteins_100g * 10) / 10,
-		fat_100g: Math.round(product.fat_100g * 10) / 10,
-		carbs_100g: Math.round(product.carbohydrates_100g * 10) / 10,
-		serving_quantity: serving_quantity,
+		caloriesPer100g: Math.round(energy_100g),
+		proteinPer100g: Math.round(product.proteins_100g * 10) / 10,
+		fatPer100g: Math.round(product.fat_100g * 10) / 10,
+		carbsPer100g: Math.round(product.carbohydrates_100g * 10) / 10,
+		servingQuantity: serving_quantity,
 	}
 }
 
@@ -102,7 +103,6 @@ export const searchByBarcode = async (
 		...headers,
 		app_uuid: uuid,
 	}
-	console.log("Searching by barcode:", barcode, "uuid:", uuid)
 	const response = await axios.get(url.href, { headers: requestHeaders })
 	const product = response.data.product as OpenFoodFactsProduct
 	if (!filterProduct(product)) return null

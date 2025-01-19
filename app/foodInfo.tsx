@@ -120,24 +120,24 @@ export default function FoodInfo() {
 
 	const quantityInGrams = useMemo(() => {
 		return isServings
-			? Number(servings) * Number(food?.serving_quantity)
+			? Number(servings) * Number(food?.servingQuantity)
 			: Number(grams)
 	}, [isServings, grams, servings, food])
 
 	const caloriesCalculated = useMemo(() => {
-		return (Number(food?.energy_100g) * quantityInGrams) / 100
+		return (Number(food?.caloriesPer100g) * quantityInGrams) / 100
 	}, [quantityInGrams, food])
 
 	const carbohydratesCalculated = useMemo(() => {
-		return (Number(food?.carbs_100g) * quantityInGrams) / 100
+		return (Number(food?.carbsPer100g) * quantityInGrams) / 100
 	}, [quantityInGrams, food])
 
 	const proteinsCalculated = useMemo(() => {
-		return (Number(food?.protein_100g) * quantityInGrams) / 100
+		return (Number(food?.proteinPer100g) * quantityInGrams) / 100
 	}, [quantityInGrams, food])
 
 	const fatCalculated = useMemo(() => {
-		return (Number(food?.fat_100g) * quantityInGrams) / 100
+		return (Number(food?.fatPer100g) * quantityInGrams) / 100
 	}, [quantityInGrams, food])
 
 	const handleChangeText = useCallback(
@@ -158,18 +158,21 @@ export default function FoodInfo() {
 			await updateDiaryEntry({
 				id: diaryEntry.id,
 				quantity: Number(inputDisplayValue),
-				is_servings: isServings,
-				meal_type: meal,
+				isServings: isServings,
+				mealType: meal,
 				food: diaryEntry.food,
 			})
 		} else {
 			const today = new Date()
 			await addDiaryEntry({
 				date: today,
-				is_servings: isServings,
+				isServings: isServings,
 				quantity: Number(inputDisplayValue),
-				meal_type: meal,
+				mealType: meal,
 				food: food,
+			}).catch((error) => {
+				console.error("Error adding diary entry:", error)
+				return false
 			})
 		}
 		// little animation :)
@@ -186,7 +189,7 @@ export default function FoodInfo() {
 
 	useEffect(() => {
 		if (!diaryEntry) return
-		setIsServings(diaryEntry.is_servings)
+		setIsServings(diaryEntry.isServings)
 		setServings(diaryEntry.quantity.toString())
 		setGrams(diaryEntry.quantity.toString())
 	}, [diaryEntry])
@@ -282,7 +285,7 @@ export default function FoodInfo() {
 							Servings
 						</ThemedText>
 						<ThemedText centered type="subtitleBold">
-							({food?.serving_quantity}g)
+							({food?.servingQuantity}g)
 						</ThemedText>
 					</TouchableOpacity>
 				</View>

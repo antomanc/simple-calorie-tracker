@@ -13,15 +13,10 @@ export const useSummary = () => {
 	const calculateTotal = useCallback((diaryEntries: DiaryEntry[]) => {
 		const total = diaryEntries.reduce(
 			(acc, entry) => {
-				const servingAdjustedQuantity = entry.is_servings
-					? entry.quantity * entry.food.serving_quantity
-					: entry.quantity
-				acc.calories += entry.kcal
-				acc.carbs +=
-					(entry.food.carbs_100g * servingAdjustedQuantity) / 100
-				acc.protein +=
-					(entry.food.protein_100g * servingAdjustedQuantity) / 100
-				acc.fat += (entry.food.fat_100g * servingAdjustedQuantity) / 100
+				acc.calories += entry.kcalTotal
+				acc.carbs += entry.carbsTotal
+				acc.protein += entry.proteinTotal
+				acc.fat += entry.fatTotal
 				acc.foodsStrings.push(entry.food.name)
 				return acc
 			},

@@ -122,7 +122,7 @@ export const CompactFoodItem = ({
 							</ThemedText>
 							<ThemedText type="subtitleBold" numberOfLines={1}>
 								{diaryEntry.food.brand}, {diaryEntry.quantity}{" "}
-								{diaryEntry.is_servings ? "serving/s" : "g"}
+								{diaryEntry.isServings ? "serving/s" : "g"}
 							</ThemedText>
 						</View>
 						<View style={styles.rightSide}>

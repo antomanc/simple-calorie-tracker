@@ -1,9 +1,10 @@
 import { Food } from "@/hooks/useDiary"
+import { generateDatabaseId } from "@/utils/Ids"
 import { capitalizeFirstLetter } from "@/utils/Strings"
 import axios from "axios"
 
 interface UsdaFoodItem {
-	fdcId: number
+	id: number
 	description: string
 	brandOwner?: string
 	foodNutrients: {
@@ -31,14 +32,14 @@ const usdaFoodToFood = (item: UsdaFoodItem): Food => {
 		{} as Record<string, number>
 	)
 	return {
-		id: item.fdcId.toString(),
+		id: generateDatabaseId({ source: "USDA", id: item.id }),
 		name: capitalizeFirstLetter(item.description),
 		brand,
-		energy_100g: Math.round(energy || 0),
-		protein_100g: nutrients["protein"] || 0,
-		fat_100g: nutrients["total lipid (fat)"] || 0,
-		carbs_100g: nutrients["carbohydrate, by difference"] || 0,
-		serving_quantity: 100,
+		caloriesPer100g: Math.round(energy || 0),
+		proteinPer100g: nutrients["protein"] || 0,
+		fatPer100g: nutrients["total lipid (fat)"] || 0,
+		carbsPer100g: nutrients["carbohydrate, by difference"] || 0,
+		servingQuantity: 100,
 	}
 }
 
