@@ -46,6 +46,8 @@ const usdaFoodToFood = (item: UsdaFoodItem): Food => {
 
 export const USDA_API_KEY_DEFAULT = "DEMO_KEY"
 
+// TODO it seems that the search by name is returning also branded foods
+// dataType should be checked, it should only return generic foods
 const dataType = ["Foundation", "SR Legacy"]
 
 export const searchByName = async (

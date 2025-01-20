@@ -34,7 +34,7 @@ export const CustomPressable = ({
 		() =>
 			StyleSheet.create({
 				wrapper: {
-					borderRadius: borderRadius,
+					borderRadius,
 					overflow: "hidden",
 					margin,
 					marginTop,

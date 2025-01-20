@@ -1,6 +1,5 @@
 import React, { useMemo } from "react"
-import { View, StyleSheet } from "react-native"
-import { CustomPressable } from "./CustomPressable"
+import { View, StyleSheet, Pressable } from "react-native"
 import { ThemedText } from "./ThemedText"
 import { useThemeColor } from "@/hooks/useThemeColor"
 
@@ -54,8 +53,9 @@ export const GenericListItem = ({
 			}),
 		[theme]
 	)
+
 	return (
-		<CustomPressable
+		<Pressable
 			onPress={onPress}
 			style={styles.itemContainer}
 			android_ripple={{ color: theme.text }}
@@ -73,7 +73,9 @@ export const GenericListItem = ({
 					</ThemedText>
 				)}
 			</View>
-			<View style={styles.rightSide}>{rightComponent}</View>
-		</CustomPressable>
+			<View style={styles.rightSide} pointerEvents="none">
+				{rightComponent}
+			</View>
+		</Pressable>
 	)
 }

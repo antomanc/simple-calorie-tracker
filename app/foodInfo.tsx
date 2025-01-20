@@ -221,6 +221,13 @@ export default function FoodInfo() {
 		}
 	}, [food])
 
+	useEffect(() => {
+		return () => {
+			setFood(null)
+			setDiaryEntry(null)
+		}
+	}, [])
+
 	// TODO add a nice animation for the values changing
 	return (
 		<View style={styles.mainContainer}>

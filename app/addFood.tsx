@@ -16,13 +16,19 @@ import { capitalizeFirstLetter } from "@/utils/Strings"
 import { Ionicons } from "@expo/vector-icons"
 import { router } from "expo-router"
 import React, { useCallback, useContext, useEffect, useMemo } from "react"
-import { View, StyleSheet, TouchableOpacity, Dimensions } from "react-native"
-import { ScrollView } from "react-native-gesture-handler"
+import {
+	View,
+	StyleSheet,
+	TouchableOpacity,
+	Dimensions,
+	ScrollView,
+} from "react-native"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 
 export default function AddFood() {
 	const theme = useThemeColor()
 	const { meal, setFood } = useContext(SelectionContext)
-	const { favoriteFoods } = useFood()
+	const { favoriteFoods, mostUsedFoods } = useFood()
 
 	useNavigationBarColor(theme.background)
 	const windowWidth = useMemo(() => Dimensions.get("window").width, [])
@@ -34,10 +40,6 @@ export default function AddFood() {
 					backgroundColor: theme.background,
 					alignItems: "center",
 					justifyContent: "flex-start",
-					flex: 1,
-				},
-				contentContainer: {
-					width: "100%",
 					flex: 1,
 				},
 				searchRow: {
@@ -68,11 +70,12 @@ export default function AddFood() {
 				},
 				scrollViewPage: {
 					width: windowWidth + 1,
+					flex: 1,
 					justifyContent: "flex-start",
 					alignItems: "center",
 				},
 			}),
-		[theme.background, theme.text, theme.secondary, windowWidth]
+		[theme, windowWidth]
 	)
 
 	const handleTextInputPress = useCallback(() => {
@@ -109,12 +112,15 @@ export default function AddFood() {
 				animated: true,
 			})
 		}
-	}, [selectedType])
+	}, [selectedType, windowWidth, scrollViewRef])
 
-	const handleFoodPress = useCallback((food: Food) => {
-		setFood(food)
-		router.push({ pathname: "/foodInfo" })
-	}, [])
+	const handleFoodPress = useCallback(
+		(food: Food) => {
+			setFood(food)
+			router.push({ pathname: "/foodInfo" })
+		},
+		[setFood]
+	)
 
 	return (
 		<DismissKeyboard>
@@ -149,91 +155,108 @@ export default function AddFood() {
 						}
 					/>
 				)}
-				<View style={styles.contentContainer}>
-					<View style={styles.searchRow}>
+				<View style={styles.searchRow}>
+					<TouchableOpacity
+						style={styles.searchBox}
+						activeOpacity={0.6}
+						onPress={handleTextInputPress}
+					>
+						<Ionicons
+							name="search"
+							size={28}
+							color={theme.background}
+						/>
+						<ThemedText
+							style={{
+								fontWeight: "500",
+								fontSize: 16,
+							}}
+							color={theme.background}
+						>
+							What are you looking for?
+						</ThemedText>
 						<TouchableOpacity
-							style={styles.searchBox}
-							activeOpacity={0.6}
-							onPress={handleTextInputPress}
+							style={styles.qrButton}
+							onPress={handleQrPress}
 						>
 							<Ionicons
-								name="search"
-								size={28}
+								name="qr-code"
+								size={24}
 								color={theme.background}
 							/>
-							<ThemedText
-								style={{
-									fontWeight: "500",
-									fontSize: 16,
-								}}
-								color={theme.background}
-							>
-								What are you looking for?
-							</ThemedText>
-							<TouchableOpacity
-								style={styles.qrButton}
-								onPress={handleQrPress}
-							>
-								<Ionicons
-									name="qr-code"
-									size={24}
-									color={theme.background}
-								/>
-							</TouchableOpacity>
 						</TouchableOpacity>
-					</View>
-					<View style={styles.foodTypeRow}>
-						<TabSelector
-							tabs={["favorite", "frequent"]}
-							onTabChange={setSelectedType}
-							selectedTab={selectedType}
-						/>
-					</View>
+					</TouchableOpacity>
+				</View>
+				<View style={styles.foodTypeRow}>
+					<TabSelector
+						tabs={["favorite", "frequent"]}
+						onTabChange={setSelectedType}
+						selectedTab={selectedType}
+					/>
+				</View>
+				<GestureHandlerRootView>
 					<ScrollView
 						ref={scrollViewRef}
-						contentContainerStyle={{
-							flexGrow: 1,
-						}}
 						horizontal
 						showsHorizontalScrollIndicator={false}
 						pagingEnabled
 						scrollEnabled={false}
+						contentContainerStyle={{
+							flexGrow: 1,
+						}}
 					>
-						<View style={styles.scrollViewPage}>
-							{favoriteFoods.map((food) => (
-								<GenericListItem
-									key={food.id}
-									title={food.name}
-									subtitle={`${food.brand}, ${food.servingQuantity} g`}
-									onPress={() => handleFoodPress(food)}
-									rightComponent={
-										<ThemedText>
-											{food.servingQuantity
-												? Math.round(
-														(food.servingQuantity *
-															food.caloriesPer100g) /
-															100
-													)
-												: food.caloriesPer100g}{" "}
-											Cal
-										</ThemedText>
-									}
-								/>
-							))}
-						</View>
-						<View style={styles.scrollViewPage}>
-							<ThemedText
-								style={{
-									marginTop: 16,
-								}}
-							>
-								Feature coming soon
-							</ThemedText>
-						</View>
-					</ScrollView>
+						{["favorite", "frequent"].map((type) => {
+							const foods =
+								type === "favorite"
+									? favoriteFoods
+									: mostUsedFoods
+							const noFoodsText =
+								type === "favorite"
+									? "No favorite foods yet \n Time to add some!"
+									: "No frequent foods yet \n Time to log some!"
 
-					<BottomButton text="Done" onPress={handleDonePress} />
-				</View>
+							return (
+								<View key={type} style={styles.scrollViewPage}>
+									{foods.length === 0 ? (
+										<ThemedText
+											style={{
+												fontSize: 16,
+												marginTop: 32,
+												textAlign: "center",
+											}}
+										>
+											{noFoodsText}
+										</ThemedText>
+									) : (
+										foods.map((food) => (
+											<GenericListItem
+												key={food.id}
+												title={food.name}
+												subtitle={`${food.brand}, ${food.servingQuantity} g`}
+												onPress={() =>
+													handleFoodPress(food)
+												}
+												rightComponent={
+													<ThemedText>
+														{food.servingQuantity
+															? Math.round(
+																	(food.servingQuantity *
+																		food.caloriesPer100g) /
+																		100
+																)
+															: food.caloriesPer100g}{" "}
+														Cal
+													</ThemedText>
+												}
+											/>
+										))
+									)}
+								</View>
+							)
+						})}
+					</ScrollView>
+				</GestureHandlerRootView>
+				<BottomButton text="Done" onPress={handleDonePress} />
 			</View>
 		</DismissKeyboard>
 	)

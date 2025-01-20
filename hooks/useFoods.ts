@@ -4,26 +4,35 @@ import { useCallback, useEffect, useState } from "react"
 
 export const useFood = () => {
 	const [favoriteFoods, setFavoriteFoods] = useState<Food[]>([])
+	const [mostUsedFoods, setMostUsedFoods] = useState<Food[]>([])
 
-	const { fetchFavoriteFoods } = useDatabase()
+	const { fetchMostUsedFoods, fetchFavoriteFoods } = useDatabase()
 
-	const fetchFoods = useCallback(async () => {
+	const retrieveFavoriteFoods = useCallback(async () => {
 		const foods = await fetchFavoriteFoods()
 		setFavoriteFoods(foods)
 	}, [fetchFavoriteFoods])
 
+	const retrieveMostUsedFoods = useCallback(async () => {
+		const foods = await fetchMostUsedFoods()
+		setMostUsedFoods(foods)
+	}, [fetchMostUsedFoods])
+
 	useEffect(() => {
-		fetchFoods()
-	}, [fetchFoods])
+		retrieveFavoriteFoods()
+	}, [retrieveFavoriteFoods, fetchMostUsedFoods])
 
 	useFocusEffect(
 		useCallback(() => {
-			fetchFoods()
-		}, [fetchFoods])
+			retrieveFavoriteFoods()
+			retrieveMostUsedFoods()
+		}, [retrieveFavoriteFoods, retrieveMostUsedFoods])
 	)
 
 	return {
 		favoriteFoods,
-		fetchFoods,
+		retrieveFavoriteFoods,
+		mostUsedFoods,
+		retrieveMostUsedFoods,
 	}
 }

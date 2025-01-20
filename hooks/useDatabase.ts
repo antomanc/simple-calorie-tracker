@@ -107,8 +107,6 @@ const dbNotInitializedError = new Error("Diary database is not initialized")
 export const useDatabase = () => {
 	const { db } = useDiaryContext()
 
-	// TODO maybe split this into two hooks, one for food and one for diary entries
-
 	const fetchFood = useCallback(
 		async (id: FoodId): Promise<Food | null> => {
 			if (!db) throw dbNotInitializedError
@@ -367,6 +365,34 @@ export const useDatabase = () => {
 		}))
 	}, [db])
 
+	const fetchMostUsedFoods = useCallback(async () => {
+		if (!db) throw dbNotInitializedError
+		const rows = ((await db.getAllAsync(
+			`SELECT 
+       f.id, f.name, f.brand, f.serving_quantity,
+       f.energy_100g, f.protein_100g, f.carbs_100g, f.fat_100g,
+       COUNT(de.id) as entry_count
+     FROM food f
+     INNER JOIN diary_entries de ON f.id = de.food_id
+     WHERE de.date >= DATE('now', '-30 days')
+     GROUP BY f.id, f.name, f.brand, f.serving_quantity,
+              f.energy_100g, f.protein_100g, f.carbs_100g, f.fat_100g
+     ORDER BY entry_count DESC
+     LIMIT 15`
+		)) || []) as DbFood[]
+		return rows.map((row) => ({
+			id: row.id,
+			name: row.name,
+			brand: row.brand,
+			servingQuantity: row.serving_quantity,
+			caloriesPer100g: row.energy_100g,
+			proteinPer100g: row.protein_100g,
+			carbsPer100g: row.carbs_100g,
+			fatPer100g: row.fat_100g,
+			isFavorite: false,
+		}))
+	}, [db])
+
 	const isFoodFavorite = useCallback(
 		async (foodId: FoodId): Promise<boolean> => {
 			if (!db) throw dbNotInitializedError
@@ -422,6 +448,7 @@ export const useDatabase = () => {
 		addDiaryEntry,
 		updateDiaryEntry,
 		deleteDiaryEntry,
+		fetchMostUsedFoods,
 		fetchFavoriteFoods,
 		isFoodFavorite,
 		addFavoriteFood,

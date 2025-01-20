@@ -146,7 +146,7 @@ export default function SearchFood() {
 				animated: true,
 			})
 		}
-	}, [selectedTab])
+	}, [selectedTab, windowWidth, scrollViewRef])
 
 	const handleRequestFocus = useCallback(() => {
 		textInputRef.current?.focus()
@@ -187,7 +187,10 @@ export default function SearchFood() {
 						{(tab === "generic" ? genericState : brandedState)
 							.loading ? (
 							<View style={styles.loading}>
-								<ActivityIndicator color={theme.primary} />
+								<ActivityIndicator
+									color={theme.primary}
+									size="large"
+								/>
 							</View>
 						) : (tab === "generic" ? genericState : brandedState)
 								.error ? (
