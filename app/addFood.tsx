@@ -1,6 +1,7 @@
 import { BottomButton } from "@/components/BottomButton"
 import { DismissKeyboard } from "@/components/DismissKeyboard"
 import { Header } from "@/components/Header"
+import { TabSelector } from "@/components/searchFoodPage/TabSelector"
 import { ThemedText } from "@/components/ThemedText"
 import { borderRadius } from "@/constants/Theme"
 import useNavigationBarColor from "@/hooks/useNavigationBarColor"
@@ -31,12 +32,11 @@ export default function AddFood() {
 				},
 				contentContainer: {
 					width: "100%",
-					padding: 16,
 					flex: 1,
-					justifyContent: "space-between",
 				},
 				searchRow: {
 					width: "100%",
+					padding: 16,
 				},
 				searchBox: {
 					height: 52,
@@ -55,6 +55,20 @@ export default function AddFood() {
 					width: 48,
 					justifyContent: "center",
 					alignItems: "center",
+				},
+				foodTypeRow: {
+					width: "100%",
+					flexDirection: "row",
+				},
+				foodTypeButton: {
+					height: 52,
+					width: "50%",
+					justifyContent: "center",
+					alignItems: "center",
+				},
+				foodTypeButtonSelected: {
+					borderBottomWidth: 2,
+					borderBottomColor: theme.secondary,
 				},
 			}),
 		[theme.background, theme.text, theme.secondary]
@@ -80,6 +94,10 @@ export default function AddFood() {
 	const handleQrPress = useCallback(() => {
 		router.push({ pathname: "/barcodeScanner" })
 	}, [])
+
+	const [selectedType, setSelectedType] = React.useState<
+		"frequent" | "favorite"
+	>("frequent")
 
 	return (
 		<DismissKeyboard>
@@ -146,6 +164,13 @@ export default function AddFood() {
 								/>
 							</TouchableOpacity>
 						</TouchableOpacity>
+					</View>
+					<View style={styles.foodTypeRow}>
+						<TabSelector
+							tabs={["frequent", "favorite"]}
+							onTabChange={setSelectedType}
+							selectedTab={selectedType}
+						/>
 					</View>
 					<BottomButton text="Done" onPress={handleDonePress} />
 				</View>

@@ -52,6 +52,18 @@ export const DiaryProvider: React.FC<{ children: React.ReactNode }> = ({
 					);`
 				)
 
+				await database.execAsync(
+					`CREATE TABLE IF NOT EXISTS favorite_food (
+						id INTEGER PRIMARY KEY AUTOINCREMENT,
+						food_id TEXT NOT NULL,
+						FOREIGN KEY (food_id) REFERENCES food (id)
+					);`
+				)
+
+				await database.execAsync(
+					`CREATE INDEX IF NOT EXISTS favorite_food_food_id ON favorite_food(food_id);`
+				)
+
 				console.log("Database initialized successfully")
 				setDb(database)
 			} catch (error) {

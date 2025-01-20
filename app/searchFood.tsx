@@ -26,6 +26,9 @@ import { borderRadius } from "@/constants/Theme"
 import { TabSelector } from "@/components/searchFoodPage/TabSelector"
 import { SearchBar } from "@/components/searchFoodPage/SearchBar"
 
+const foodCategoryTabs = ["generic", "branded"] as const
+type FoodCategoryTab = (typeof foodCategoryTabs)[number]
+
 export default function SearchFood() {
 	const theme = useThemeColor()
 	const { brandedState, genericState, handleSearch } = useSearchFood()
@@ -87,7 +90,7 @@ export default function SearchFood() {
 	const textInputRef = useRef<TextInput>(null)
 	const { goBack } = useLocalSearchParams()
 	const { setFood } = useContext(SelectionContext)
-	const [tab, setTab] = useState<"generic" | "branded">("generic")
+	const [tab, setTab] = useState<FoodCategoryTab>("generic")
 	const [searchQuery, setSearchQuery] = useState("")
 
 	useNavigationBarColor(theme.background)
@@ -189,7 +192,11 @@ export default function SearchFood() {
 						setSearchQuery("")
 					}}
 				/>
-				<TabSelector tab={tab} onTabChange={setTab} />
+				<TabSelector
+					tabs={foodCategoryTabs}
+					selectedTab={tab}
+					onTabChange={setTab}
+				/>
 			</View>
 
 			<FlatList

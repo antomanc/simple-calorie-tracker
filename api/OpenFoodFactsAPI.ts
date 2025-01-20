@@ -65,6 +65,7 @@ const OpenFoodFactsProductToFood = (
 		fatPer100g: Math.round(product.fat_100g * 10) / 10,
 		carbsPer100g: Math.round(product.carbohydrates_100g * 10) / 10,
 		servingQuantity: serving_quantity,
+		isFavorite: null,
 	}
 }
 

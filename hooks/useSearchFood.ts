@@ -4,7 +4,7 @@ import { searchByName as searchByNameUsda } from "@/api/UsdaApi"
 import { searchByName as searchByNameOpenFoodFacts } from "@/api/OpenFoodFactsAPI"
 import { useSettings } from "@/providers/SettingsProvider"
 
-type SearchType = "generic" | "branded"
+export type SearchType = "generic" | "branded"
 
 interface SearchState {
 	searchQuery: string

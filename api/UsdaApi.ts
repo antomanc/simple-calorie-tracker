@@ -40,6 +40,7 @@ const usdaFoodToFood = (item: UsdaFoodItem): Food => {
 		fatPer100g: nutrients["total lipid (fat)"] || 0,
 		carbsPer100g: nutrients["carbohydrate, by difference"] || 0,
 		servingQuantity: 100,
+		isFavorite: null,
 	}
 }
 

@@ -28,7 +28,13 @@ export default function FoodInfo() {
 	const theme = useThemeColor()
 	const { meal, food, setFood, diaryEntry, setDiaryEntry } =
 		useContext(SelectionContext)
-	const { addDiaryEntry, updateDiaryEntry } = useDiary()
+	const {
+		addDiaryEntry,
+		updateDiaryEntry,
+		addFavoriteFood,
+		deleteFavoriteFood,
+		isFoodFavorite,
+	} = useDiary()
 
 	useNavigationBarColor(theme.surface)
 
@@ -194,6 +200,30 @@ export default function FoodInfo() {
 		setGrams(diaryEntry.quantity.toString())
 	}, [diaryEntry])
 
+	const [optimisticIsFavorite, setOptimisticIsFavorite] = useState(
+		food?.isFavorite ?? false
+	)
+
+	const toggleFavorite = useCallback(() => {
+		if (!food) return
+		if (optimisticIsFavorite) {
+			deleteFavoriteFood(food.id)
+			setOptimisticIsFavorite(false)
+		} else {
+			addFavoriteFood(food)
+			setOptimisticIsFavorite(true)
+		}
+	}, [food, deleteFavoriteFood, addFavoriteFood, optimisticIsFavorite])
+
+	useEffect(() => {
+		if (!food) return
+		if (food.isFavorite === null) {
+			isFoodFavorite(food.id).then((isFavorite) => {
+				setOptimisticIsFavorite(isFavorite)
+			})
+		}
+	}, [food])
+
 	// TODO add a nice animation for the values changing
 	return (
 		<View style={styles.mainContainer}>
@@ -206,6 +236,29 @@ export default function FoodInfo() {
 								name="close"
 								size={26}
 								color={theme.text}
+							/>
+						</TouchableOpacity>
+					}
+					rightComponent={
+						<TouchableOpacity
+							onPress={toggleFavorite}
+							style={{
+								padding: 8,
+								borderRadius: 100,
+							}}
+						>
+							<Ionicons
+								name={
+									optimisticIsFavorite
+										? "heart"
+										: "heart-outline"
+								}
+								size={26}
+								color={
+									optimisticIsFavorite
+										? theme.secondary
+										: theme.text
+								}
 							/>
 						</TouchableOpacity>
 					}
