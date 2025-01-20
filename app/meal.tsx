@@ -5,7 +5,7 @@ import { InfoSummaryRow } from "@/components/InfoSummaryRow"
 import { TitleContainer } from "@/components/TitleContainer"
 import { mealsToIcons } from "@/constants/Meals"
 import { borderRadius } from "@/constants/Theme"
-import { DiaryEntry, useDiary } from "@/hooks/useDiary"
+import { DiaryEntry, useDatabase } from "@/hooks/useDatabase"
 import useNavigationBarColor from "@/hooks/useNavigationBarColor"
 import { useNutritionData } from "@/hooks/useNutritionData"
 import { useSummary } from "@/hooks/useSummary"
@@ -130,7 +130,7 @@ export default function FoodInfo() {
 		})
 	}, [])
 
-	const { deleteDiaryEntry } = useDiary()
+	const { deleteDiaryEntry } = useDatabase()
 
 	const handleEntryDelete = useCallback((entry: DiaryEntry) => {
 		deleteDiaryEntry(entry.id).then(() => {

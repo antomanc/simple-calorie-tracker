@@ -1,9 +1,12 @@
 import { BottomButton } from "@/components/BottomButton"
 import { DismissKeyboard } from "@/components/DismissKeyboard"
+import { GenericListItem } from "@/components/GenericListItem"
 import { Header } from "@/components/Header"
 import { TabSelector } from "@/components/searchFoodPage/TabSelector"
 import { ThemedText } from "@/components/ThemedText"
 import { borderRadius } from "@/constants/Theme"
+import { Food } from "@/hooks/useDatabase"
+import { useFood } from "@/hooks/useFoods"
 import useNavigationBarColor from "@/hooks/useNavigationBarColor"
 import { useNutritionData } from "@/hooks/useNutritionData"
 import { useThemeColor } from "@/hooks/useThemeColor"
@@ -13,13 +16,16 @@ import { capitalizeFirstLetter } from "@/utils/Strings"
 import { Ionicons } from "@expo/vector-icons"
 import { router } from "expo-router"
 import React, { useCallback, useContext, useEffect, useMemo } from "react"
-import { View, StyleSheet, TouchableOpacity } from "react-native"
+import { View, StyleSheet, TouchableOpacity, Dimensions } from "react-native"
+import { ScrollView } from "react-native-gesture-handler"
 
 export default function AddFood() {
 	const theme = useThemeColor()
-	const { meal } = useContext(SelectionContext)
+	const { meal, setFood } = useContext(SelectionContext)
+	const { favoriteFoods } = useFood()
 
 	useNavigationBarColor(theme.background)
+	const windowWidth = useMemo(() => Dimensions.get("window").width, [])
 
 	const styles = useMemo(
 		() =>
@@ -60,18 +66,13 @@ export default function AddFood() {
 					width: "100%",
 					flexDirection: "row",
 				},
-				foodTypeButton: {
-					height: 52,
-					width: "50%",
-					justifyContent: "center",
+				scrollViewPage: {
+					width: windowWidth + 1,
+					justifyContent: "flex-start",
 					alignItems: "center",
 				},
-				foodTypeButtonSelected: {
-					borderBottomWidth: 2,
-					borderBottomColor: theme.secondary,
-				},
 			}),
-		[theme.background, theme.text, theme.secondary]
+		[theme.background, theme.text, theme.secondary, windowWidth]
 	)
 
 	const handleTextInputPress = useCallback(() => {
@@ -96,8 +97,24 @@ export default function AddFood() {
 	}, [])
 
 	const [selectedType, setSelectedType] = React.useState<
-		"frequent" | "favorite"
-	>("frequent")
+		"favorite" | "frequent"
+	>("favorite")
+
+	const scrollViewRef = React.useRef<ScrollView>(null)
+
+	useEffect(() => {
+		if (scrollViewRef.current) {
+			scrollViewRef.current.scrollTo({
+				x: selectedType === "favorite" ? 0 : windowWidth,
+				animated: true,
+			})
+		}
+	}, [selectedType])
+
+	const handleFoodPress = useCallback((food: Food) => {
+		setFood(food)
+		router.push({ pathname: "/foodInfo" })
+	}, [])
 
 	return (
 		<DismissKeyboard>
@@ -167,11 +184,54 @@ export default function AddFood() {
 					</View>
 					<View style={styles.foodTypeRow}>
 						<TabSelector
-							tabs={["frequent", "favorite"]}
+							tabs={["favorite", "frequent"]}
 							onTabChange={setSelectedType}
 							selectedTab={selectedType}
 						/>
 					</View>
+					<ScrollView
+						ref={scrollViewRef}
+						contentContainerStyle={{
+							flexGrow: 1,
+						}}
+						horizontal
+						showsHorizontalScrollIndicator={false}
+						pagingEnabled
+						scrollEnabled={false}
+					>
+						<View style={styles.scrollViewPage}>
+							{favoriteFoods.map((food) => (
+								<GenericListItem
+									key={food.id}
+									title={food.name}
+									subtitle={`${food.brand}, ${food.servingQuantity} g`}
+									onPress={() => handleFoodPress(food)}
+									rightComponent={
+										<ThemedText>
+											{food.servingQuantity
+												? Math.round(
+														(food.servingQuantity *
+															food.caloriesPer100g) /
+															100
+													)
+												: food.caloriesPer100g}{" "}
+											Cal
+										</ThemedText>
+									}
+								/>
+							))}
+						</View>
+						<View style={styles.scrollViewPage}>
+							<ThemedText
+								style={{
+									marginTop: 16,
+								}}
+							>
+								Feature coming soon
+							</ThemedText>
+						</View>
+					</ScrollView>
+
 					<BottomButton text="Done" onPress={handleDonePress} />
 				</View>
 			</View>

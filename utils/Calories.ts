@@ -1,4 +1,4 @@
-import { Food } from "@/hooks/useDiary"
+import { Food } from "@/hooks/useDatabase"
 
 export const caloriesFromMacros = (
 	protein: number,

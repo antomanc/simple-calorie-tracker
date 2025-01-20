@@ -1,4 +1,4 @@
-import { DiaryEntry } from "./useDiary"
+import { DiaryEntry } from "./useDatabase"
 import { useCallback } from "react"
 
 export interface Summary {

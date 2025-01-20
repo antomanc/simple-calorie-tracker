@@ -12,7 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import { SelectionProvider } from "@/providers/SelectionProvider"
 import * as SystemUI from "expo-system-ui"
 import useNavigationBarColor from "@/hooks/useNavigationBarColor"
-import { DiaryProvider } from "@/providers/DiaryProvider"
+import { DiaryProvider } from "@/providers/DatabaseProvider"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { SettingsProvider } from "@/providers/SettingsProvider"
 

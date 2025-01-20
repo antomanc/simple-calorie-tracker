@@ -1,4 +1,4 @@
-import { Food } from "@/hooks/useDiary"
+import { Food } from "@/hooks/useDatabase"
 import { generateDatabaseId } from "@/utils/Ids"
 import { capitalizeFirstLetter } from "@/utils/Strings"
 import axios from "axios"

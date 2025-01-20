@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from "react"
-import { Food } from "@/hooks/useDiary"
+import { Food } from "@/hooks/useDatabase"
 import { searchByName as searchByNameUsda } from "@/api/UsdaApi"
 import { searchByName as searchByNameOpenFoodFacts } from "@/api/OpenFoodFactsAPI"
 import { useSettings } from "@/providers/SettingsProvider"

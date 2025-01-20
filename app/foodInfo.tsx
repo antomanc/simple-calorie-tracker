@@ -5,7 +5,7 @@ import { InfoSummaryRow } from "@/components/InfoSummaryRow"
 import { ThemedText } from "@/components/ThemedText"
 import { TitleContainer } from "@/components/TitleContainer"
 import { borderRadius } from "@/constants/Theme"
-import { useDiary } from "@/hooks/useDiary"
+import { useDatabase } from "@/hooks/useDatabase"
 import useNavigationBarColor from "@/hooks/useNavigationBarColor"
 import { useThemeColor } from "@/hooks/useThemeColor"
 import useTruncate from "@/hooks/useTruncate"
@@ -34,7 +34,7 @@ export default function FoodInfo() {
 		addFavoriteFood,
 		deleteFavoriteFood,
 		isFoodFavorite,
-	} = useDiary()
+	} = useDatabase()
 
 	useNavigationBarColor(theme.surface)
 
@@ -176,9 +176,6 @@ export default function FoodInfo() {
 				quantity: Number(inputDisplayValue),
 				mealType: meal,
 				food: food,
-			}).catch((error) => {
-				console.error("Error adding diary entry:", error)
-				return false
 			})
 		}
 		// little animation :)
@@ -256,7 +253,7 @@ export default function FoodInfo() {
 								size={26}
 								color={
 									optimisticIsFavorite
-										? theme.secondary
+										? theme.primary
 										: theme.text
 								}
 							/>
