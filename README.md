@@ -9,14 +9,16 @@ This is a free and open source **React Native** application that helps you track
 
 ## Features
 
-- Search or scan foods with [OpenFoodFacts](https://openfoodfacts.org/) or [USDA](https://fdc.nal.usda.gov/) api integration
+- Search foods by name or barcode with [OpenFoodFacts](https://openfoodfacts.org/) and [USDA](https://fdc.nal.usda.gov/) api integration
 - Track calories, protein, fat, and carbohydrates in a daily diary
+- Add custom entries with your own nutritional values
+- Save your favorite foods for quick access
 - Customize your daily targets
 
 ## TODOs
 
 - [ ] Cache for USDA searches. Since the USDA databases changes very rarely, a cache for queries can be implemented without worries, with a very long invalidation time.
-- [ ] Recents and frequently used foods. This could be a very handy feature for people that eat some food very ofted, like cereals, milk, eggs or this kind of food.
+- [x] Recents and frequently used foods. This could be a very handy feature for people that eat some food very ofted, like cereals, milk, eggs or this kind of food.
 - [ ] Internationalization. I developed this app without multi languages support in mind, but since there is a small set of pages and components, it's not an hard to implement feature.
 - [ ] Changing the day in the diary. At the moment the diary page supports only showing the current day, but having the possibility to change the day could be useful.
 
