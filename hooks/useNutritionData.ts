@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
-import { DiaryEntry, useDiary } from "./useDiary"
+import { DiaryEntry, useDatabase } from "./useDatabase"
 import { MealsDistribution } from "@/interfaces/Meals"
 import { useFocusEffect } from "expo-router"
 
@@ -10,7 +10,7 @@ interface UseNutritionDataProps {
 export const useNutritionData = ({ date }: UseNutritionDataProps) => {
 	const [mealDiaryEntries, setMealDiaryEntries] =
 		useState<MealsDistribution<DiaryEntry[]>>()
-	const { fetchDiaryEntries } = useDiary()
+	const { fetchDiaryEntries } = useDatabase()
 
 	const refetchDiaryEntries = useCallback(() => {
 		fetchDiaryEntries(date).then(setMealDiaryEntries)

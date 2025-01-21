@@ -1,12 +1,13 @@
 import { Ionicons } from "@expo/vector-icons"
 import { useMemo, useState } from "react"
-import { Animated, View, StyleSheet } from "react-native"
+import { Animated, StyleSheet } from "react-native"
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable"
 import { CustomPressable } from "./CustomPressable"
 import { ThemedText } from "./ThemedText"
-import { DiaryEntry } from "@/hooks/useDiary"
+import { DiaryEntry } from "@/hooks/useDatabase"
 import { useThemeColor } from "@/hooks/useThemeColor"
 import { useSummary } from "@/hooks/useSummary"
+import { GenericListItem } from "./GenericListItem"
 
 type CompactFoodItemProps = {
 	diaryEntry: DiaryEntry
@@ -79,6 +80,15 @@ export const CompactFoodItem = ({
 		[diaryEntry, calculateTotal]
 	)
 
+	const subtitle = useMemo(() => {
+		if (diaryEntry.food.servingQuantity === 0) {
+			return diaryEntry.food.brand ?? ""
+		}
+		return `${diaryEntry.food.brand}, ${diaryEntry.quantity} ${
+			diaryEntry.isServings ? "serving/s" : "g"
+		}`
+	}, [diaryEntry])
+
 	return (
 		<Animated.View
 			style={[
@@ -105,41 +115,27 @@ export const CompactFoodItem = ({
 				friction={1}
 			>
 				{!isHidden && (
-					<CustomPressable
+					<GenericListItem
+						title={diaryEntry.food.name}
+						subtitle={subtitle}
+						rightComponent={
+							<>
+								<ThemedText>
+									{Math.round(entrySummary.calories)} Cal
+								</ThemedText>
+								{addIcon && (
+									<CustomPressable onPress={onAddPress}>
+										<Ionicons
+											name="add-circle-outline"
+											size={24}
+											color={theme.text}
+										/>
+									</CustomPressable>
+								)}
+							</>
+						}
 						onPress={() => onEntryTap(diaryEntry)}
-						style={styles.itemContainer}
-						android_ripple={{ color: theme.text }}
-					>
-						<View style={styles.leftText}>
-							<ThemedText
-								style={{
-									color: theme.text,
-									fontSize: 16,
-								}}
-								numberOfLines={1}
-							>
-								{diaryEntry.food.name}
-							</ThemedText>
-							<ThemedText type="subtitleBold" numberOfLines={1}>
-								{diaryEntry.food.brand}, {diaryEntry.quantity}{" "}
-								{diaryEntry.is_servings ? "serving/s" : "g"}
-							</ThemedText>
-						</View>
-						<View style={styles.rightSide}>
-							<ThemedText>
-								{Math.round(entrySummary.calories)} Cal
-							</ThemedText>
-							{addIcon && (
-								<CustomPressable onPress={onAddPress}>
-									<Ionicons
-										name="add-circle-outline"
-										size={24}
-										color={theme.text}
-									/>
-								</CustomPressable>
-							)}
-						</View>
-					</CustomPressable>
+					/>
 				)}
 			</Swipeable>
 		</Animated.View>

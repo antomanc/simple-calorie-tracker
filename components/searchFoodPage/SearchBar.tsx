@@ -1,7 +1,6 @@
 import { useThemeColor } from "@/hooks/useThemeColor"
 import { forwardRef, useCallback, useMemo } from "react"
 import { TextInput, StyleSheet, TouchableOpacity } from "react-native"
-import { CustomPressable } from "../CustomPressable"
 import { Ionicons } from "@expo/vector-icons"
 import { borderRadius } from "@/constants/Theme"
 import { router } from "expo-router"
@@ -61,10 +60,14 @@ const SearchBarComponent = forwardRef<
 		}, [])
 
 		return (
-			<CustomPressable style={styles.searchBox} onPress={onRequestFocus}>
-				<CustomPressable onPress={handleBack} hitSlop={24}>
+			<TouchableOpacity
+				activeOpacity={1}
+				style={styles.searchBox}
+				onPress={onRequestFocus}
+			>
+				<TouchableOpacity onPress={handleBack} hitSlop={10}>
 					<Ionicons name="arrow-back" size={28} color={theme.text} />
-				</CustomPressable>
+				</TouchableOpacity>
 				<TextInput
 					ref={ref}
 					clearButtonMode="never"
@@ -78,10 +81,10 @@ const SearchBarComponent = forwardRef<
 					returnKeyType="search"
 					style={styles.textInput}
 				/>
-				<TouchableOpacity onPress={onClear}>
+				<TouchableOpacity onPress={onClear} hitSlop={10}>
 					<Ionicons name="close" size={28} color={theme.text} />
 				</TouchableOpacity>
-			</CustomPressable>
+			</TouchableOpacity>
 		)
 	}
 )

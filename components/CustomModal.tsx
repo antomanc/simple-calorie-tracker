@@ -1,9 +1,8 @@
 import { borderRadius } from "@/constants/Theme"
 import { useThemeColor } from "@/hooks/useThemeColor"
 import { useMemo } from "react"
-import { Modal, StyleSheet, View } from "react-native"
+import { Modal, StyleSheet, TouchableOpacity, View } from "react-native"
 import { ThemedText } from "./ThemedText"
-import { CustomPressable } from "./CustomPressable"
 
 type CustomModalProps = {
 	visible: boolean
@@ -32,7 +31,7 @@ export const CustomModal = ({
 					flex: 1,
 					justifyContent: "center",
 					alignItems: "center",
-					backgroundColor: "rgba(0,0,0,0.6)",
+					backgroundColor: "rgba(0,0,0,0.5)",
 				},
 				modal: {
 					borderRadius: borderRadius,
@@ -69,7 +68,7 @@ export const CustomModal = ({
 						</ThemedText>
 						{children}
 						<View style={styles.buttons}>
-							<CustomPressable onPress={onDismiss} hitSlop={24}>
+							<TouchableOpacity onPress={onDismiss} hitSlop={10}>
 								<ThemedText
 									style={{
 										fontSize: 16,
@@ -78,8 +77,8 @@ export const CustomModal = ({
 								>
 									CANCEL
 								</ThemedText>
-							</CustomPressable>
-							<CustomPressable onPress={onSubmit} hitSlop={24}>
+							</TouchableOpacity>
+							<TouchableOpacity onPress={onSubmit} hitSlop={10}>
 								<ThemedText
 									style={{
 										fontSize: 16,
@@ -88,7 +87,7 @@ export const CustomModal = ({
 								>
 									SAVE
 								</ThemedText>
-							</CustomPressable>
+							</TouchableOpacity>
 						</View>
 					</View>
 				</View>

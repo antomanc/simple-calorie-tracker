@@ -1,4 +1,5 @@
-import { Food } from "@/hooks/useDiary"
+import { Food } from "@/hooks/useDatabase"
+import { generateDatabaseId } from "@/utils/Ids"
 import { capitalizeFirstLetter } from "@/utils/Strings"
 import axios from "axios"
 
@@ -31,19 +32,22 @@ const usdaFoodToFood = (item: UsdaFoodItem): Food => {
 		{} as Record<string, number>
 	)
 	return {
-		id: item.fdcId.toString(),
+		id: generateDatabaseId({ source: "USDA", id: item.fdcId }),
 		name: capitalizeFirstLetter(item.description),
 		brand,
-		energy_100g: Math.round(energy || 0),
-		protein_100g: nutrients["protein"] || 0,
-		fat_100g: nutrients["total lipid (fat)"] || 0,
-		carbs_100g: nutrients["carbohydrate, by difference"] || 0,
-		serving_quantity: 100,
+		caloriesPer100g: Math.round(energy || 0),
+		proteinPer100g: nutrients["protein"] || 0,
+		fatPer100g: nutrients["total lipid (fat)"] || 0,
+		carbsPer100g: nutrients["carbohydrate, by difference"] || 0,
+		servingQuantity: 100,
+		isFavorite: null,
 	}
 }
 
 export const USDA_API_KEY_DEFAULT = "DEMO_KEY"
 
+// TODO it seems that the search by name is returning also branded foods
+// dataType should be checked, it should only return generic foods
 const dataType = ["Foundation", "SR Legacy"]
 
 export const searchByName = async (

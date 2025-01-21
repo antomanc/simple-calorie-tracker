@@ -1,5 +1,5 @@
 import React, { createContext, useState, ReactNode } from "react"
-import { DiaryEntry, Food } from "@/hooks/useDiary"
+import { DiaryEntry, Food } from "@/hooks/useDatabase"
 import { MealType } from "@/interfaces/Meals"
 
 type SelectionContext = {

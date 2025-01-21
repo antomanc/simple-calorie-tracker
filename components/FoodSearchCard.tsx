@@ -3,7 +3,7 @@ import { useThemeColor } from "@/hooks/useThemeColor"
 import { useMemo } from "react"
 import { View, StyleSheet } from "react-native"
 import { ThemedText } from "./ThemedText"
-import { Food } from "@/hooks/useDiary"
+import { Food } from "@/hooks/useDatabase"
 import { CustomPressable } from "./CustomPressable"
 import useTruncate from "@/hooks/useTruncate"
 import { capitalizeFirstLetter } from "@/utils/Strings"
@@ -52,8 +52,8 @@ export const FoodSearchCard = ({ food, onTap }: FoodSearchCardProps) => {
 	)
 
 	const caloriesPerServing = useMemo(
-		() => (food.serving_quantity * food.energy_100g) / 100,
-		[food.serving_quantity, food.energy_100g]
+		() => (food.servingQuantity * food.caloriesPer100g) / 100,
+		[food.servingQuantity, food.caloriesPer100g]
 	)
 
 	const capitilizedProductName = useMemo(
@@ -85,7 +85,7 @@ export const FoodSearchCard = ({ food, onTap }: FoodSearchCardProps) => {
 				</ThemedText>
 				<ThemedText type={"subtitleBoldLight"} numberOfLines={1}>
 					{truncatedBrand}
-					{food.brand ? "," : null} {food.serving_quantity} g
+					{food.brand ? "," : null} {food.servingQuantity} g
 				</ThemedText>
 			</View>
 			<View style={styles.rightContainer}>

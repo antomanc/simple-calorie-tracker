@@ -1,125 +1,128 @@
 import { useState, useRef, useCallback } from "react"
-import { Food } from "@/hooks/useDiary"
-import { searchByName as searchByNameUsda } from "@/api/UsdaApi"
+import { Food } from "@/hooks/useDatabase"
+import {
+	searchByName as searchByNameUsda,
+	USDA_API_KEY_DEFAULT,
+} from "@/api/UsdaApi"
 import { searchByName as searchByNameOpenFoodFacts } from "@/api/OpenFoodFactsAPI"
 import { useSettings } from "@/providers/SettingsProvider"
 
-type SearchType = "generic" | "branded"
+export type SearchType = "generic" | "branded"
 
 interface SearchState {
 	searchQuery: string
-	searchResults: Food[]
-	loading: boolean
+	data: Food[]
+	isLoading: boolean
 	error: string | null
 	lastQuery: string | null
 }
 
-export const useSearchFood = () => {
-	const initialSearchState: SearchState = {
+interface UseSearchResult {
+	data: Food[]
+	isLoading: boolean
+	isError: boolean
+	error: string | null
+	lastQuery: string | null
+	search: (query?: string) => Promise<void>
+}
+
+const useSearch = (
+	searchFn: (query: string, key: string) => Promise<Food[]>,
+	apiKey: string
+): UseSearchResult => {
+	const [state, setState] = useState<SearchState>({
 		searchQuery: "",
-		searchResults: [],
-		loading: false,
+		data: [],
+		isLoading: false,
 		error: null,
 		lastQuery: null,
-	}
-
-	const [searchState, setSearchState] = useState<
-		Record<SearchType, SearchState>
-	>({
-		generic: { ...initialSearchState },
-		branded: { ...initialSearchState },
 	})
 
-	const requestIdRefGeneric = useRef(0)
-	const requestIdRefBranded = useRef(0)
+	const requestIdRef = useRef(0)
 
-	const { usdaApiKey, userUuid } = useSettings()
-
-	const handleSearch = useCallback(
-		async (type: SearchType, searchQuery?: string) => {
-			if (!userUuid) return
-
-			const currentState = searchState[type]
-			const trimmedQuery = searchQuery?.trim() ?? currentState.searchQuery
+	const search = useCallback(
+		async (searchQuery?: string) => {
+			const trimmedQuery = searchQuery?.trim() ?? state.searchQuery
 
 			if (!trimmedQuery) {
-				setSearchState((prev) => ({
-					...prev,
-					[type]: { ...prev[type], searchResults: [], error: null },
-				}))
+				setState((prev) => ({ ...prev, data: [], error: null }))
 				return
 			}
 
-			console.log("Searching for:", trimmedQuery, "type:", type)
+			requestIdRef.current++
+			const currentRequestId = requestIdRef.current
 
-			if (type === "generic") {
-				requestIdRefGeneric.current++
-			} else {
-				requestIdRefBranded.current++
-			}
-			const currentRequestId =
-				type === "generic"
-					? requestIdRefGeneric.current
-					: requestIdRefBranded.current
-
-			setSearchState((prev) => ({
+			setState((prev) => ({
 				...prev,
-				[type]: {
-					...prev[type],
-					searchResults: [],
-					loading: true,
-					error: null,
-					lastQuery: trimmedQuery,
-				},
+				isLoading: true,
+				error: null,
+				lastQuery: trimmedQuery,
 			}))
 
 			try {
-				const results = await (type === "generic"
-					? searchByNameUsda(trimmedQuery, usdaApiKey)
-					: searchByNameOpenFoodFacts(trimmedQuery, userUuid))
+				const results = await searchFn(trimmedQuery, apiKey)
 
-				if (
-					(type === "generic" &&
-						currentRequestId === requestIdRefGeneric.current) ||
-					(type === "branded" &&
-						currentRequestId === requestIdRefBranded.current)
-				) {
-					setSearchState((prev) => ({
+				if (currentRequestId === requestIdRef.current) {
+					setState((prev) => ({
 						...prev,
-						[type]: {
-							...prev[type],
-							searchResults: results,
-							loading: false,
-						},
+						data: results,
+						isLoading: false,
 					}))
 				}
 			} catch (err) {
-				if (
-					(type === "generic" &&
-						currentRequestId === requestIdRefGeneric.current) ||
-					(type === "branded" &&
-						currentRequestId === requestIdRefBranded.current)
-				) {
-					setSearchState((prev) => ({
+				if (currentRequestId === requestIdRef.current) {
+					setState((prev) => ({
 						...prev,
-						[type]: {
-							...prev[type],
-							error:
-								err instanceof Error
-									? err.message
-									: "Unknown error",
-							loading: false,
-						},
+						error:
+							err instanceof Error
+								? err.message
+								: "Unknown error",
+						isLoading: false,
 					}))
 				}
 			}
 		},
-		[searchState, usdaApiKey, userUuid]
+		[searchFn, apiKey, state.searchQuery]
 	)
 
 	return {
-		genericState: searchState.generic,
-		brandedState: searchState.branded,
+		data: state.data,
+		isLoading: state.isLoading,
+		isError: !!state.error,
+		error: state.error,
+		lastQuery: state.lastQuery,
+		search,
+	}
+}
+
+const useGenericSearch = () => {
+	const { usdaApiKey } = useSettings()
+	return useSearch(searchByNameUsda, usdaApiKey ?? USDA_API_KEY_DEFAULT)
+}
+
+const useBrandedSearch = () => {
+	const { userUuid } = useSettings()
+	return useSearch(searchByNameOpenFoodFacts, userUuid ?? "")
+}
+
+export const useSearchFood = () => {
+	const generic = useGenericSearch()
+	const branded = useBrandedSearch()
+
+	const handleSearch = useCallback(
+		async (type: SearchType, query?: string) => {
+			if (type === "generic") {
+				await generic.search(query)
+			} else {
+				await branded.search(query)
+			}
+		},
+		[generic, branded]
+	)
+
+	return {
+		generic,
+		branded,
 		handleSearch,
 	}
 }

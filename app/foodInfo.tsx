@@ -5,7 +5,7 @@ import { InfoSummaryRow } from "@/components/InfoSummaryRow"
 import { ThemedText } from "@/components/ThemedText"
 import { TitleContainer } from "@/components/TitleContainer"
 import { borderRadius } from "@/constants/Theme"
-import { useDiary } from "@/hooks/useDiary"
+import { useDatabase } from "@/hooks/useDatabase"
 import useNavigationBarColor from "@/hooks/useNavigationBarColor"
 import { useThemeColor } from "@/hooks/useThemeColor"
 import useTruncate from "@/hooks/useTruncate"
@@ -28,7 +28,13 @@ export default function FoodInfo() {
 	const theme = useThemeColor()
 	const { meal, food, setFood, diaryEntry, setDiaryEntry } =
 		useContext(SelectionContext)
-	const { addDiaryEntry, updateDiaryEntry } = useDiary()
+	const {
+		addDiaryEntry,
+		updateDiaryEntry,
+		addFavoriteFood,
+		deleteFavoriteFood,
+		isFoodFavorite,
+	} = useDatabase()
 
 	useNavigationBarColor(theme.surface)
 
@@ -70,7 +76,6 @@ export default function FoodInfo() {
 				quantityInputText: {
 					height: 45,
 					width: 65,
-
 					color: theme.text,
 					fontWeight: "bold",
 					textAlign: "center",
@@ -120,24 +125,24 @@ export default function FoodInfo() {
 
 	const quantityInGrams = useMemo(() => {
 		return isServings
-			? Number(servings) * Number(food?.serving_quantity)
+			? Number(servings) * Number(food?.servingQuantity)
 			: Number(grams)
 	}, [isServings, grams, servings, food])
 
 	const caloriesCalculated = useMemo(() => {
-		return (Number(food?.energy_100g) * quantityInGrams) / 100
+		return (Number(food?.caloriesPer100g) * quantityInGrams) / 100
 	}, [quantityInGrams, food])
 
 	const carbohydratesCalculated = useMemo(() => {
-		return (Number(food?.carbs_100g) * quantityInGrams) / 100
+		return (Number(food?.carbsPer100g) * quantityInGrams) / 100
 	}, [quantityInGrams, food])
 
 	const proteinsCalculated = useMemo(() => {
-		return (Number(food?.protein_100g) * quantityInGrams) / 100
+		return (Number(food?.proteinPer100g) * quantityInGrams) / 100
 	}, [quantityInGrams, food])
 
 	const fatCalculated = useMemo(() => {
-		return (Number(food?.fat_100g) * quantityInGrams) / 100
+		return (Number(food?.fatPer100g) * quantityInGrams) / 100
 	}, [quantityInGrams, food])
 
 	const handleChangeText = useCallback(
@@ -158,17 +163,17 @@ export default function FoodInfo() {
 			await updateDiaryEntry({
 				id: diaryEntry.id,
 				quantity: Number(inputDisplayValue),
-				is_servings: isServings,
-				meal_type: meal,
+				isServings: isServings,
+				mealType: meal,
 				food: diaryEntry.food,
 			})
 		} else {
 			const today = new Date()
 			await addDiaryEntry({
 				date: today,
-				is_servings: isServings,
+				isServings: isServings,
 				quantity: Number(inputDisplayValue),
-				meal_type: meal,
+				mealType: meal,
 				food: food,
 			})
 		}
@@ -186,10 +191,41 @@ export default function FoodInfo() {
 
 	useEffect(() => {
 		if (!diaryEntry) return
-		setIsServings(diaryEntry.is_servings)
+		setIsServings(diaryEntry.isServings)
 		setServings(diaryEntry.quantity.toString())
 		setGrams(diaryEntry.quantity.toString())
 	}, [diaryEntry])
+
+	const [optimisticIsFavorite, setOptimisticIsFavorite] = useState(
+		food?.isFavorite ?? false
+	)
+
+	const toggleFavorite = useCallback(() => {
+		if (!food) return
+		if (optimisticIsFavorite) {
+			deleteFavoriteFood(food.id)
+			setOptimisticIsFavorite(false)
+		} else {
+			addFavoriteFood(food)
+			setOptimisticIsFavorite(true)
+		}
+	}, [food, deleteFavoriteFood, addFavoriteFood, optimisticIsFavorite])
+
+	useEffect(() => {
+		if (!food) return
+		if (food.isFavorite === null) {
+			isFoodFavorite(food.id).then((isFavorite) => {
+				setOptimisticIsFavorite(isFavorite)
+			})
+		}
+	}, [food])
+
+	useEffect(() => {
+		return () => {
+			setFood(null)
+			setDiaryEntry(null)
+		}
+	}, [])
 
 	// TODO add a nice animation for the values changing
 	return (
@@ -198,11 +234,38 @@ export default function FoodInfo() {
 				<Header
 					title={capitalizeFirstLetter(getMealTypeLabel(meal) ?? "")}
 					leftComponent={
-						<TouchableOpacity onPress={() => router.back()}>
+						<TouchableOpacity
+							onPress={() => router.back()}
+							hitSlop={10}
+						>
 							<Ionicons
 								name="close"
 								size={26}
 								color={theme.text}
+							/>
+						</TouchableOpacity>
+					}
+					rightComponent={
+						<TouchableOpacity
+							onPress={toggleFavorite}
+							hitSlop={10}
+							style={{
+								padding: 8,
+								borderRadius: 100,
+							}}
+						>
+							<Ionicons
+								name={
+									optimisticIsFavorite
+										? "heart"
+										: "heart-outline"
+								}
+								size={26}
+								color={
+									optimisticIsFavorite
+										? theme.primary
+										: theme.text
+								}
 							/>
 						</TouchableOpacity>
 					}
@@ -282,7 +345,7 @@ export default function FoodInfo() {
 							Servings
 						</ThemedText>
 						<ThemedText centered type="subtitleBold">
-							({food?.serving_quantity}g)
+							({food?.servingQuantity}g)
 						</ThemedText>
 					</TouchableOpacity>
 				</View>

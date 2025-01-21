@@ -34,10 +34,11 @@ export const CustomTextInput = ({ ...props }: CustomTextInputProps) => {
 
 	return (
 		<TextInput
-			{...props}
-			style={[styles.textInput, props.style]}
+			placeholderTextColor={`${theme.text}80`}
 			onFocus={() => setIsFocused(true)}
 			onBlur={() => setIsFocused(false)}
+			{...props}
+			style={[styles.textInput, props.style]}
 		/>
 	)
 }

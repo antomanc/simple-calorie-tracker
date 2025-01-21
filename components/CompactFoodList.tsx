@@ -1,4 +1,4 @@
-import { DiaryEntry } from "@/hooks/useDiary"
+import { DiaryEntry } from "@/hooks/useDatabase"
 import { useThemeColor } from "@/hooks/useThemeColor"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { View, StyleSheet, FlatList, Animated } from "react-native"
@@ -59,6 +59,7 @@ export const CompactFoodList = ({
 	const renderItem = useCallback(
 		({ item: diaryEntry }: { item: DiaryEntry }) => (
 			<CompactFoodItem
+				key={diaryEntry.id}
 				diaryEntry={diaryEntry}
 				onEntryTap={onEntryTap}
 				onEntryDelete={handleEntryDelete}

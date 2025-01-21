@@ -25,10 +25,10 @@ export const SettingItem = ({
 		() =>
 			StyleSheet.create({
 				inputContainer: {
-					marginTop: 16,
-					height: 50,
 					flexDirection: "column",
 					alignItems: "flex-start",
+					paddingHorizontal: 16,
+					paddingVertical: 8,
 				},
 				label: {
 					fontSize: 16,

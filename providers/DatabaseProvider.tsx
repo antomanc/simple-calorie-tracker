@@ -21,24 +21,47 @@ export const DiaryProvider: React.FC<{ children: React.ReactNode }> = ({
 			try {
 				await database.execAsync(
 					`CREATE TABLE IF NOT EXISTS diary_entries (
-              id INTEGER PRIMARY KEY AUTOINCREMENT,
-              quantity REAL NOT NULL,
-              is_servings BOOLEAN NOT NULL,
-              date TEXT NOT NULL,
-              meal_type INTEGER NOT NULL,
-			  kcal REAL NOT NULL,
-			  food_name TEXT NOT NULL,
-			  food_brand TEXT,
-			  food_serving_quantity REAL NOT NULL,
-			  food_energy_100g REAL NOT NULL,
-			  food_protein_100g REAL,
-			  food_carbs_100g REAL,
-			  food_fat_100g REAL
-			);`
+						id INTEGER PRIMARY KEY AUTOINCREMENT,
+						quantity REAL NOT NULL,
+						is_servings BOOLEAN NOT NULL,
+						date TEXT NOT NULL,
+						meal_type INTEGER NOT NULL,
+						kcal_total REAL NOT NULL,
+						protein_total REAL NOT NULL,
+						carbs_total REAL NOT NULL,
+						fat_total REAL NOT NULL,
+						food_id TEXT NOT NULL,
+						FOREIGN KEY (food_id) REFERENCES food (id)
+					);`
 				)
 
 				await database.execAsync(
 					`CREATE INDEX IF NOT EXISTS diary_entries_date ON diary_entries(date);`
+				)
+
+				await database.execAsync(
+					`CREATE TABLE IF NOT EXISTS food (
+						id TEXT PRIMARY KEY,
+						name TEXT NOT NULL,
+						brand TEXT,
+						serving_quantity REAL NOT NULL,
+						energy_100g REAL NOT NULL,
+						protein_100g REAL,
+						carbs_100g REAL,
+						fat_100g REAL
+					);`
+				)
+
+				await database.execAsync(
+					`CREATE TABLE IF NOT EXISTS favorite_food (
+						id INTEGER PRIMARY KEY AUTOINCREMENT,
+						food_id TEXT NOT NULL,
+						FOREIGN KEY (food_id) REFERENCES food (id)
+					);`
+				)
+
+				await database.execAsync(
+					`CREATE INDEX IF NOT EXISTS favorite_food_food_id ON favorite_food(food_id);`
 				)
 
 				console.log("Database initialized successfully")
