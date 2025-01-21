@@ -93,6 +93,10 @@ export type NewDiaryEntry = {
 	date: Date
 	mealType: number
 	food: Food
+	overrideCalories?: number
+	overrideProtein?: number
+	overrideCarbs?: number
+	overrideFat?: number
 }
 
 export type UpdateDiaryEntry = {
@@ -251,6 +255,11 @@ export const useDatabase = () => {
 				food: entry.food,
 			})
 
+			macros.calories = entry.overrideCalories || macros.calories
+			macros.protein = entry.overrideProtein || macros.protein
+			macros.carbs = entry.overrideCarbs || macros.carbs
+			macros.fat = entry.overrideFat || macros.fat
+
 			const existingFood = await fetchFood(entry.food.id)
 
 			if (!existingFood) {
@@ -376,7 +385,7 @@ export const useDatabase = () => {
 	 FROM food f
 	 INNER JOIN diary_entries de ON f.id = de.food_id
 	 LEFT JOIN favorite_food ff ON ff.food_id = f.id
-	 WHERE de.date >= DATE('now', '-30 days')
+	 WHERE de.date >= DATE('now', '-30 days') AND f.serving_quantity > 0
 	 GROUP BY f.id, f.name, f.brand, f.serving_quantity,
 			  f.energy_100g, f.protein_100g, f.carbs_100g, f.fat_100g
 	 ORDER BY entry_count DESC

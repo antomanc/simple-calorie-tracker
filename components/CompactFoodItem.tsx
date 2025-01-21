@@ -80,6 +80,15 @@ export const CompactFoodItem = ({
 		[diaryEntry, calculateTotal]
 	)
 
+	const subtitle = useMemo(() => {
+		if (diaryEntry.food.servingQuantity === 0) {
+			return diaryEntry.food.brand ?? ""
+		}
+		return `${diaryEntry.food.brand}, ${diaryEntry.quantity} ${
+			diaryEntry.isServings ? "serving/s" : "g"
+		}`
+	}, [diaryEntry])
+
 	return (
 		<Animated.View
 			style={[
@@ -108,9 +117,7 @@ export const CompactFoodItem = ({
 				{!isHidden && (
 					<GenericListItem
 						title={diaryEntry.food.name}
-						subtitle={`${diaryEntry.food.brand}, ${diaryEntry.quantity} ${
-							diaryEntry.isServings ? "serving/s" : "g"
-						}`}
+						subtitle={subtitle}
 						rightComponent={
 							<>
 								<ThemedText>

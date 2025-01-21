@@ -31,7 +31,6 @@ export default function Index() {
 				},
 				contentContainer: {
 					flex: 1,
-					paddingHorizontal: 16,
 				},
 			}),
 		[theme]
@@ -197,7 +196,7 @@ export default function Index() {
 							/>
 						</SettingItem>
 						<ThemedText
-							style={{ marginTop: 16 }}
+							style={{ margin: 16 }}
 							color={totalPercentage === 100 ? theme.text : "red"}
 							type="subtitleBold"
 						>

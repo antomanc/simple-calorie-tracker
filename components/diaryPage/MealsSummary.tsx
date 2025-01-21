@@ -99,7 +99,6 @@ export const MealsSummary = ({ meals }: MealsSummaryProps) => {
 								borderRadius={borderRadius}
 								android_ripple={{ color: theme.text }}
 								onPress={() => handlePressCard(meal)}
-								hitSlop={24}
 							>
 								<View style={styles.itemsRow}>
 									<CalorieMealProgress
@@ -130,6 +129,7 @@ export const MealsSummary = ({ meals }: MealsSummaryProps) => {
 										</ThemedText>
 									</View>
 									<TouchableOpacity
+										hitSlop={8}
 										style={styles.button}
 										onPress={() => handleAddFood({ meal })}
 									>

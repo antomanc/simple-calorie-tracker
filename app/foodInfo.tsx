@@ -76,7 +76,6 @@ export default function FoodInfo() {
 				quantityInputText: {
 					height: 45,
 					width: 65,
-
 					color: theme.text,
 					fontWeight: "bold",
 					textAlign: "center",
@@ -235,7 +234,10 @@ export default function FoodInfo() {
 				<Header
 					title={capitalizeFirstLetter(getMealTypeLabel(meal) ?? "")}
 					leftComponent={
-						<TouchableOpacity onPress={() => router.back()}>
+						<TouchableOpacity
+							onPress={() => router.back()}
+							hitSlop={10}
+						>
 							<Ionicons
 								name="close"
 								size={26}
@@ -246,6 +248,7 @@ export default function FoodInfo() {
 					rightComponent={
 						<TouchableOpacity
 							onPress={toggleFavorite}
+							hitSlop={10}
 							style={{
 								padding: 8,
 								borderRadius: 100,

@@ -139,6 +139,9 @@ export default function FoodInfo() {
 	}, [])
 
 	const handleOnEntryTap = useCallback((diaryEntry: DiaryEntry) => {
+		if (diaryEntry.food.servingQuantity === 0) {
+			return
+		}
 		setDiaryEntry(diaryEntry)
 		setFood(diaryEntry.food)
 		router.push({ pathname: "/foodInfo" })
