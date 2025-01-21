@@ -42,6 +42,22 @@ export default function AddFood() {
 					justifyContent: "flex-start",
 					flex: 1,
 				},
+				headerRightComponentContainer: {
+					flexDirection: "row",
+					gap: 16,
+					justifyContent: "center",
+					alignItems: "center",
+				},
+				foodQuantityContainer: {
+					width: 32,
+					height: 32,
+					borderRadius: "50%",
+					backgroundColor: "transparent",
+					alignItems: "center",
+					justifyContent: "center",
+					borderWidth: 1,
+					borderColor: theme.text,
+				},
 				searchRow: {
 					width: "100%",
 					padding: 16,
@@ -131,26 +147,24 @@ export default function AddFood() {
 							getMealTypeLabel(meal) ?? ""
 						)}
 						rightComponent={
-							<View
-								style={{
-									width: 32,
-									height: 32,
-									borderRadius: "50%",
-									backgroundColor: "transparent",
-									alignItems: "center",
-									justifyContent: "center",
-									borderWidth: 1,
-									borderColor: theme.text,
-								}}
-							>
-								<ThemedText
-									centered
-									style={{
-										fontSize: 15,
-									}}
-								>
-									{mealDiaryEntries?.[meal]?.length ?? 0}
-								</ThemedText>
+							<View style={styles.headerRightComponentContainer}>
+								<View style={styles.foodQuantityContainer}>
+									<ThemedText
+										centered
+										style={{
+											fontSize: 15,
+										}}
+									>
+										{mealDiaryEntries?.[meal]?.length ?? 0}
+									</ThemedText>
+								</View>
+								<TouchableOpacity onPress={() => {}}>
+									<Ionicons
+										name="ellipsis-vertical"
+										size={24}
+										color={theme.text}
+									/>
+								</TouchableOpacity>
 							</View>
 						}
 					/>

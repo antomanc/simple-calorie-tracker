@@ -72,7 +72,7 @@ export type DbFood = {
 	protein_100g: number
 	carbs_100g: number
 	fat_100g: number
-	isFavorite: number
+	is_favorite: number
 }
 
 export type Food = {
@@ -136,7 +136,7 @@ export const useDatabase = () => {
 				proteinPer100g: row.protein_100g,
 				carbsPer100g: row.carbs_100g,
 				fatPer100g: row.fat_100g,
-				isFavorite: row.isFavorite === 1,
+				isFavorite: row.is_favorite === 1,
 			}
 		},
 		[db]
@@ -369,16 +369,18 @@ export const useDatabase = () => {
 		if (!db) throw dbNotInitializedError
 		const rows = ((await db.getAllAsync(
 			`SELECT 
-       f.id, f.name, f.brand, f.serving_quantity,
-       f.energy_100g, f.protein_100g, f.carbs_100g, f.fat_100g,
-       COUNT(de.id) as entry_count
-     FROM food f
-     INNER JOIN diary_entries de ON f.id = de.food_id
-     WHERE de.date >= DATE('now', '-30 days')
-     GROUP BY f.id, f.name, f.brand, f.serving_quantity,
-              f.energy_100g, f.protein_100g, f.carbs_100g, f.fat_100g
-     ORDER BY entry_count DESC
-     LIMIT 15`
+	   f.id, f.name, f.brand, f.serving_quantity,
+	   f.energy_100g, f.protein_100g, f.carbs_100g, f.fat_100g,
+	   COUNT(de.id) as entry_count,
+	   CASE WHEN ff.food_id IS NOT NULL THEN 1 ELSE 0 END AS is_favorite
+	 FROM food f
+	 INNER JOIN diary_entries de ON f.id = de.food_id
+	 LEFT JOIN favorite_food ff ON ff.food_id = f.id
+	 WHERE de.date >= DATE('now', '-30 days')
+	 GROUP BY f.id, f.name, f.brand, f.serving_quantity,
+			  f.energy_100g, f.protein_100g, f.carbs_100g, f.fat_100g
+	 ORDER BY entry_count DESC
+	 LIMIT 15`
 		)) || []) as DbFood[]
 		return rows.map((row) => ({
 			id: row.id,
@@ -389,7 +391,7 @@ export const useDatabase = () => {
 			proteinPer100g: row.protein_100g,
 			carbsPer100g: row.carbs_100g,
 			fatPer100g: row.fat_100g,
-			isFavorite: false,
+			isFavorite: row.is_favorite === 1,
 		}))
 	}, [db])
 

@@ -33,7 +33,8 @@ type FoodCategoryTab = (typeof foodCategoryTabs)[number]
 
 export default function SearchFood() {
 	const theme = useThemeColor()
-	const { brandedState, genericState, handleSearch } = useSearchFood()
+	const { branded, generic, handleSearch } = useSearchFood()
+
 	const windowWidth = useMemo(() => Dimensions.get("window").width, [])
 
 	const styles = useMemo(
@@ -84,7 +85,7 @@ export default function SearchFood() {
 					alignItems: "center",
 				},
 			}),
-		[theme, brandedState, genericState, windowWidth]
+		[theme, branded, generic, windowWidth]
 	)
 
 	const textInputRef = useRef<TextInput>(null)
@@ -110,20 +111,14 @@ export default function SearchFood() {
 
 	const handleSearchType = useCallback(() => {
 		const trimmedQuery = searchQuery.trim()
-		if (
-			selectedTab === "generic" &&
-			genericState.lastQuery === trimmedQuery
-		) {
+		if (selectedTab === "generic" && generic.lastQuery === trimmedQuery) {
 			return
 		}
-		if (
-			selectedTab === "branded" &&
-			brandedState.lastQuery === trimmedQuery
-		) {
+		if (selectedTab === "branded" && branded.lastQuery === trimmedQuery) {
 			return
 		}
 		handleSearch(selectedTab, trimmedQuery)
-	}, [handleSearch, selectedTab, searchQuery, genericState, brandedState])
+	}, [handleSearch, selectedTab, searchQuery, generic, branded])
 
 	useEffect(() => {
 		handleSearchType()
@@ -184,33 +179,23 @@ export default function SearchFood() {
 			>
 				{foodCategoryTabs.map((tab) => (
 					<View key={tab} style={styles.foodListContainer}>
-						{(tab === "generic" ? genericState : brandedState)
-							.loading ? (
+						{(tab === "generic" ? generic : branded).isLoading ? (
 							<View style={styles.loading}>
 								<ActivityIndicator
 									color={theme.primary}
 									size="large"
 								/>
 							</View>
-						) : (tab === "generic" ? genericState : brandedState)
-								.error ? (
+						) : (tab === "generic" ? generic : branded).error ? (
 							<ThemedText>
-								{
-									(tab === "generic"
-										? genericState
-										: brandedState
-									).error
-								}
+								{(tab === "generic" ? generic : branded).error}
 							</ThemedText>
-						) : (tab === "generic" ? genericState : brandedState)
+						) : (tab === "generic" ? generic : branded)
 								.lastQuery ? (
 							<FlatList
 								showsVerticalScrollIndicator={false}
 								data={
-									(tab === "generic"
-										? genericState
-										: brandedState
-									).searchResults
+									(tab === "generic" ? generic : branded).data
 								}
 								keyExtractor={(item) => item.id!.toString()}
 								renderItem={({ item }) => (
