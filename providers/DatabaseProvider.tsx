@@ -33,6 +33,7 @@ export const DiaryProvider: React.FC<{ children: React.ReactNode }> = ({
 			}
 			if (!columnExists) {
 				try {
+					await database.closeAsync()
 					await SQLite.deleteDatabaseAsync("diary.db")
 					database = await SQLite.openDatabaseAsync("diary.db")
 				} catch {
