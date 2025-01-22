@@ -18,6 +18,26 @@ export const DiaryProvider: React.FC<{ children: React.ReactNode }> = ({
 		const initDB = async () => {
 			const database = await SQLite.openDatabaseAsync("diary.db")
 
+			// if the db is the old version, drop the tables and recreate them
+			let columnExists = false
+			try {
+				await database.execAsync(
+					"SELECT kcal_total FROM diary_entries LIMIT 1;"
+				)
+				columnExists = true
+			} catch {
+				columnExists = false
+			}
+			if (!columnExists) {
+				try {
+					await database.execAsync("DROP TABLE diary_entries;")
+					await database.execAsync("DROP TABLE food;")
+					await database.execAsync("DROP TABLE favorite_food;")
+				} catch {
+					console.error("Error dropping tables")
+				}
+			}
+
 			try {
 				await database.execAsync(
 					`CREATE TABLE IF NOT EXISTS diary_entries (
