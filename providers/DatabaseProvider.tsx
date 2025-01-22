@@ -16,7 +16,7 @@ export const DiaryProvider: React.FC<{ children: React.ReactNode }> = ({
 
 	useEffect(() => {
 		const initDB = async () => {
-			const database = await SQLite.openDatabaseAsync("diary.db")
+			let database = await SQLite.openDatabaseAsync("diary.db")
 
 			// if the db is the old version, drop the tables and recreate them
 			let columnExists = false
@@ -24,15 +24,17 @@ export const DiaryProvider: React.FC<{ children: React.ReactNode }> = ({
 				await database.execAsync(
 					"SELECT kcal_total FROM diary_entries LIMIT 1;"
 				)
+				await database.execAsync(
+					"SELECT is_custom_food FROM food LIMIT 1;"
+				)
 				columnExists = true
 			} catch {
 				columnExists = false
 			}
 			if (!columnExists) {
 				try {
-					await database.execAsync("DROP TABLE diary_entries;")
-					await database.execAsync("DROP TABLE food;")
-					await database.execAsync("DROP TABLE favorite_food;")
+					await SQLite.deleteDatabaseAsync("diary.db")
+					database = await SQLite.openDatabaseAsync("diary.db")
 				} catch {
 					console.error("Error dropping tables")
 				}
@@ -56,6 +58,33 @@ export const DiaryProvider: React.FC<{ children: React.ReactNode }> = ({
 				)
 
 				await database.execAsync(
+					`CREATE VIEW IF NOT EXISTS diary_entries_view AS
+						SELECT
+							de.id,
+							de.quantity,
+							de.is_servings,
+							de.date,
+							de.meal_type,
+							de.kcal_total,
+							de.protein_total,
+							de.carbs_total,
+							de.fat_total,
+							de.food_id,
+							fv.name AS food_name,
+							fv.brand AS food_brand,
+							fv.is_custom_entry AS food_is_custom_entry,
+							fv.is_custom_food AS food_is_custom_food,
+							fv.serving_quantity AS food_serving_quantity,
+							fv.energy_100g AS food_energy_100g,
+							fv.protein_100g AS food_protein_100g,
+							fv.carbs_100g AS food_carbs_100g,
+							fv.fat_100g AS food_fat_100g,
+							fv.is_favorite
+						FROM diary_entries de
+						JOIN food_view fv ON de.food_id = fv.id;`
+				)
+
+				await database.execAsync(
 					`CREATE INDEX IF NOT EXISTS diary_entries_date ON diary_entries(date);`
 				)
 
@@ -64,12 +93,32 @@ export const DiaryProvider: React.FC<{ children: React.ReactNode }> = ({
 						id TEXT PRIMARY KEY,
 						name TEXT NOT NULL,
 						brand TEXT,
+						is_custom_entry BOOLEAN NOT NULL,
+						is_custom_food BOOLEAN NOT NULL,
 						serving_quantity REAL NOT NULL,
 						energy_100g REAL NOT NULL,
 						protein_100g REAL,
 						carbs_100g REAL,
 						fat_100g REAL
 					);`
+				)
+
+				await database.execAsync(
+					`CREATE VIEW IF NOT EXISTS food_view AS
+						SELECT
+							f.id,
+							f.name,
+							f.brand,
+							f.is_custom_entry,
+							f.is_custom_food,
+							f.serving_quantity,
+							f.energy_100g,
+							f.protein_100g,
+							f.carbs_100g,
+							f.fat_100g,
+							CASE WHEN ff.food_id IS NOT NULL THEN 1 ELSE 0 END AS is_favorite
+						FROM food f
+						LEFT JOIN favorite_food ff ON f.id = ff.food_id;`
 				)
 
 				await database.execAsync(

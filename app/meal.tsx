@@ -139,13 +139,15 @@ export default function FoodInfo() {
 	}, [])
 
 	const handleOnEntryTap = useCallback((diaryEntry: DiaryEntry) => {
-		if (diaryEntry.food.servingQuantity === 0) {
+		if (diaryEntry.food.isCustomEntry) {
 			return
 		}
 		setDiaryEntry(diaryEntry)
 		setFood(diaryEntry.food)
 		router.push({ pathname: "/foodInfo" })
 	}, [])
+
+	console.log(selectedMealDiaryEntries)
 
 	return (
 		<View style={styles.mainContainer}>

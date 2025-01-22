@@ -42,6 +42,8 @@ export type DbDiaryEntry = {
 	food_id: FoodId
 	food_name: string
 	food_brand: string | null
+	food_is_custom_entry: number
+	food_is_custom_food: number
 	food_serving_quantity: number
 	food_energy_100g: number
 	food_protein_100g: number
@@ -67,6 +69,8 @@ export type DbFood = {
 	id: FoodId
 	name: string
 	brand: string
+	is_custom_entry: number
+	is_custom_food: number
 	serving_quantity: number
 	energy_100g: number
 	protein_100g: number
@@ -79,6 +83,8 @@ export type Food = {
 	id: FoodId
 	name: string
 	brand: string | null
+	isCustomEntry?: boolean
+	isCustomFood?: boolean
 	servingQuantity: number
 	caloriesPer100g: number
 	proteinPer100g: number
@@ -115,18 +121,7 @@ export const useDatabase = () => {
 		async (id: FoodId): Promise<Food | null> => {
 			if (!db) throw dbNotInitializedError
 			const row = (await db.getFirstAsync(
-				`SELECT f.id as id,
-                    f.name as name,
-                    f.brand as brand,
-                    f.serving_quantity as servingQuantity,
-                    f.energy_100g as caloriesPer100g,
-                    f.protein_100g as proteinPer100g,
-                    f.carbs_100g as carbsPer100g,
-                    f.fat_100g as fatPer100g,
-                    CASE WHEN ff.food_id IS NOT NULL THEN 1 ELSE 0 END AS isFavorite
-             FROM food f
-             LEFT JOIN favorite_food ff ON ff.food_id = f.id
-             WHERE f.id = ?`,
+				"SELECT * FROM food_view WHERE id = ?",
 				[id]
 			)) as DbFood | null
 			if (!row) return null
@@ -135,6 +130,8 @@ export const useDatabase = () => {
 				id: row.id,
 				name: row.name,
 				brand: row.brand,
+				isCustomEntry: row.is_custom_entry === 1,
+				isCustomFood: row.is_custom_food === 1,
 				servingQuantity: row.serving_quantity,
 				caloriesPer100g: row.energy_100g,
 				proteinPer100g: row.protein_100g,
@@ -154,16 +151,20 @@ export const useDatabase = () => {
 					id,
 					name,
 					brand,
+					is_custom_entry,
+					is_custom_food,
 					serving_quantity,
 					energy_100g,
 					protein_100g,
 					carbs_100g,
 					fat_100g
-				) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+				) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 				[
 					food.id,
 					food.name,
 					food.brand,
+					food.isCustomEntry ? 1 : 0,
+					food.isCustomFood ? 1 : 0,
 					food.servingQuantity,
 					food.caloriesPer100g,
 					food.proteinPer100g,
@@ -180,29 +181,7 @@ export const useDatabase = () => {
 			if (!db) throw dbNotInitializedError
 			const dateString = toISODateString(date)
 			const rows = ((await db.getAllAsync(
-				`SELECT
-                de.id,
-                de.quantity,
-                de.is_servings,
-                de.date,
-                de.meal_type,
-                de.kcal_total,
-                de.protein_total,
-                de.carbs_total,
-                de.fat_total,
-                f.id as food_id,
-                f.name as food_name,
-                f.brand as food_brand,
-                f.serving_quantity as food_serving_quantity,
-                f.energy_100g as food_energy_100g,
-                f.protein_100g as food_protein_100g,
-                f.carbs_100g as food_carbs_100g,
-                f.fat_100g as food_fat_100g,
-                CASE WHEN ff.food_id IS NOT NULL THEN 1 ELSE 0 END AS isFavorite
-            FROM diary_entries de
-            JOIN food f ON de.food_id = f.id
-            LEFT JOIN favorite_food ff ON ff.food_id = f.id
-            WHERE de.date = ?`,
+				"SELECT * FROM diary_entries_view WHERE date = ?",
 				[dateString]
 			)) || []) as DbDiaryEntry[]
 			const diaryEntries: DiaryEntry[] = rows.map((row) => ({
@@ -219,6 +198,7 @@ export const useDatabase = () => {
 					id: row.food_id,
 					name: row.food_name,
 					brand: row.food_brand,
+					isCustomEntry: row.food_is_custom_entry === 1,
 					servingQuantity: row.food_serving_quantity,
 					caloriesPer100g: row.food_energy_100g,
 					proteinPer100g: row.food_protein_100g,
@@ -349,17 +329,7 @@ export const useDatabase = () => {
 	const fetchFavoriteFoods = useCallback(async () => {
 		if (!db) throw dbNotInitializedError
 		const rows = ((await db.getAllAsync(
-			`SELECT
-				f.id as id,
-				f.name as name,
-				f.brand as brand,
-				f.serving_quantity as serving_quantity,
-				f.energy_100g as energy_100g,
-				f.protein_100g as protein_100g,
-				f.carbs_100g as carbs_100g,
-				f.fat_100g as fat_100g
-			FROM favorite_food ff
-			JOIN food f ON ff.food_id = f.id`
+			"SELECT * FROM food_view WHERE is_favorite = 1"
 		)) || []) as DbFood[]
 		return rows.map((row) => ({
 			id: row.id,
@@ -377,24 +347,20 @@ export const useDatabase = () => {
 	const fetchMostUsedFoods = useCallback(async () => {
 		if (!db) throw dbNotInitializedError
 		const rows = ((await db.getAllAsync(
-			`SELECT 
-	   f.id, f.name, f.brand, f.serving_quantity,
-	   f.energy_100g, f.protein_100g, f.carbs_100g, f.fat_100g,
-	   COUNT(de.id) as entry_count,
-	   CASE WHEN ff.food_id IS NOT NULL THEN 1 ELSE 0 END AS is_favorite
-	 FROM food f
-	 INNER JOIN diary_entries de ON f.id = de.food_id
-	 LEFT JOIN favorite_food ff ON ff.food_id = f.id
-	 WHERE de.date >= DATE('now', '-30 days') AND f.serving_quantity > 0
-	 GROUP BY f.id, f.name, f.brand, f.serving_quantity,
-			  f.energy_100g, f.protein_100g, f.carbs_100g, f.fat_100g
-	 ORDER BY entry_count DESC
-	 LIMIT 15`
+			`SELECT fv.*, COUNT(de.id) as entry_count
+			 FROM food_view fv
+			 JOIN diary_entries de ON fv.id = de.food_id
+			 WHERE de.date >= DATE('now', '-30 days')
+			   AND fv.serving_quantity > 0
+			 GROUP BY fv.id
+			 ORDER BY entry_count DESC
+			 LIMIT 15`
 		)) || []) as DbFood[]
 		return rows.map((row) => ({
 			id: row.id,
 			name: row.name,
 			brand: row.brand,
+			is_custom_entry: row.is_custom_entry === 1,
 			servingQuantity: row.serving_quantity,
 			caloriesPer100g: row.energy_100g,
 			proteinPer100g: row.protein_100g,

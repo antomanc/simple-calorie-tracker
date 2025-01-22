@@ -81,7 +81,7 @@ export const CompactFoodItem = ({
 	)
 
 	const subtitle = useMemo(() => {
-		if (diaryEntry.food.servingQuantity === 0) {
+		if (diaryEntry.food.isCustomEntry) {
 			return diaryEntry.food.brand ?? ""
 		}
 		return `${diaryEntry.food.brand}, ${diaryEntry.quantity} ${
